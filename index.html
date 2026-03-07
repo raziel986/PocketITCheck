@@ -24,6 +24,7 @@
     <!-- Librerías para Generación de PDF (jsPDF y jsPDF-AutoTable) - LOCAL para mayor velocidad -->
     <script src="libs/jspdf.umd.min.js" defer></script>
     <script src="libs/jspdf-autotable.min.js" defer></script>
+    <script src="libs/sweetalert2.all.min.js" defer></script>
     <style>
         * {
             box-sizing: border-box;
@@ -1264,11 +1265,31 @@
         }
 
         // 5. Eliminar Oficina entera y con todos sus equipos
-        function deleteOffice(id) {
-            if (confirm("⚠️ ¿Estás COMPLETAMENTE SEGURO de eliminar esta Oficina? Se perderán todos los equipos guardados dentro de este registro. Esta acción no se puede deshacer.")) {
+        async function deleteOffice(id) {
+            const result = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Se perderán todos los equipos guardados dentro de esta oficina. ¡Esta acción no se puede deshacer!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar oficina',
+                cancelButtonText: 'Cancelar',
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdrop: `rgba(15, 23, 42, 0.4)`
+            });
+
+            if (result.isConfirmed) {
                 appData = appData.filter(o => o.id !== id);
                 saveAppData();
                 renderOfficesTable();
+                Swal.fire({
+                    title: '¡Eliminado!',
+                    text: 'La oficina ha sido eliminada correctamente.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             }
         }
 
@@ -1598,8 +1619,19 @@
         }
 
         // Eliminar un elemento
-        function deleteItem(index) {
-            if (confirm(`⚠️ ¿Estás seguro de que deseas eliminar este equipo del inventario de esta Oficina?`)) {
+        async function deleteItem(index) {
+            const result = await Swal.fire({
+                title: '¿Eliminar equipo?',
+                text: "¿Estás seguro de que deseas eliminar este equipo del inventario?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Mantener'
+            });
+
+            if (result.isConfirmed) {
                 const office = getActiveOffice();
                 office.inventory.splice(index, 1);
 
@@ -1612,6 +1644,14 @@
 
                 saveAppData();
                 renderTable();
+
+                Swal.fire({
+                    title: '¡Hecho!',
+                    text: 'Equipo eliminado del inventario.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             }
         }
 
@@ -1622,7 +1662,13 @@
             if (!office) return;
             const inventoryData = office.inventory;
 
-            if (inventoryData.length === 0) return alert("❌ El inventario está vacío. No hay nada que exportar.");
+            if (inventoryData.length === 0) {
+                return Swal.fire({
+                    title: 'Inventario Vacío',
+                    text: 'No hay nada que exportar en esta oficina.',
+                    icon: 'info'
+                });
+            }
 
             // Cabeceras del CSV
             let csvContent = 'ID Activo,Estado,Categoría,Marca y Modelo,Número de Serie,Asignación,Fecha de Compra,Garantía,Especificaciones y Notas\n';
@@ -1662,10 +1708,20 @@
             if (!office) return;
             const inventoryData = office.inventory;
 
-            if (inventoryData.length === 0) return alert("❌ El inventario está vacío. No hay nada que exportar.");
+            if (inventoryData.length === 0) {
+                return Swal.fire({
+                    title: 'Inventario Vacío',
+                    text: 'No hay nada que exportar en esta oficina.',
+                    icon: 'info'
+                });
+            }
 
             if (!window.jspdf) {
-                return alert("⚠️ La librería PDF no se cargó. Verifica tu conexión a internet e intenta recargar la página.");
+                return Swal.fire({
+                    title: 'Error de Librería',
+                    text: 'La librería PDF no se cargó. Verifica tu conexión o recarga la página.',
+                    icon: 'error'
+                });
             }
 
             const { jsPDF } = window.jspdf;

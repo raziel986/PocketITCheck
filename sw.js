@@ -6,6 +6,7 @@ const ASSETS_TO_CACHE = [
     './icon-512.png',
     './libs/jspdf.umd.min.js',
     './libs/jspdf-autotable.min.js',
+    './libs/sweetalert2.all.min.js',
     'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap'
 ];
 
