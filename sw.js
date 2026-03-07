@@ -1,7 +1,10 @@
-const CACHE_NAME = 'pocketit-check-v1';
+const CACHE_NAME = 'pocketit-check-v2';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
+    './index.css',
+    './app.js',
+    './img/logo.png',
     './manifest.json',
     './icon-512.png',
     './libs/jspdf.umd.min.js',
