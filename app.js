@@ -533,6 +533,17 @@ function switchLanguage(lang) {
         renderTable();
         selectOffice(activeOfficeId); // Update summary
     }
+
+    // Refresh dynamic diagnostic panels if currently visible to cleanly reload layout constraints
+    const diagSection = document.getElementById('diag-integrated-section');
+    if (diagSection && diagSection.style.display !== 'none' && diagnosticIndex !== null) {
+        openDiagnostic(diagnosticIndex);
+    }
+
+    const resSection = document.getElementById('result-integrated-section');
+    if (resSection && resSection.style.display !== 'none' && resultIndex !== null) {
+        openMaintenanceResult(resultIndex);
+    }
 }
 
 function toggleLanguage(isEn) {
