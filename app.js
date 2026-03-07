@@ -394,7 +394,7 @@ function editItem(idx) {
     setTimeout(() => {
         if (item.dynamicData) Object.keys(item.dynamicData).forEach(id => { const el = document.getElementById(id); if (el) el.value = item.dynamicData[id]; });
     }, 10);
-    submitBtnEquipment.innerHTML = '💾'; document.getElementById('equipmentFormTitle').innerHTML = '📋 Editar Equipo';
+    submitBtnEquipment.innerHTML = '💾 Guardar Cambios'; document.getElementById('equipmentFormTitle').innerHTML = '📋 Editar Equipo';
     cancelEditBtn.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

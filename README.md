@@ -59,15 +59,13 @@ Para disfrutar de la experiencia completa sin barras de navegación y con soport
 
 ## 📜 Licencia y Derechos de Autor
 
-PocketITCheck está protegido bajo la **Licencia Creative Commons Atribución-NoComercial 4.0 Internacional (CC BY-NC 4.0)**. 
+PocketITCheck está protegido bajo la **Licencia MIT**.
 
-Esto significa que eres libre de usar y modificar esta herramienta, siempre y cuando:
-1. **Atribución:** Mantengas el crédito al autor original (**Carlos Noguera**).
-2. **Uso No Comercial:** No se permite la venta o comercialización directa de este software.
+Esto significa que eres libre de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del software, siempre y cuando se incluya el aviso de copyright original.
 
 ---
 
 ## 👨‍💻 Créditos
 
 Desarrollado por **Carlos Noguera**  
-🌐 Web: [https://raziel986.github.io/PocketInventory/](https://raziel986.github.io/PocketInventory/)
+🌐 Web: [https://raziel986.github.io/PocketITCheck/](https://raziel986.github.io/PocketITCheck/)
