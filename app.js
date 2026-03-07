@@ -61,7 +61,45 @@ const translations = {
         integratedDiag: "🩺 Diagnóstico",
         hardware: "Hardware",
         software: "Software",
+        power: "Energía",
+        cables: "Cables/Cargador",
+        battery: "Batería",
+        storage: "Almacenamiento",
+        speed: "Velocidad/Salud",
+        ram: "Memoria RAM",
+        contacts: "Limpieza de Contactos",
+        temp: "Temperatura",
+        thermalPaste: "Pasta Térmica",
+        fans: "Ventiladores/Fans",
+        clean: "Limpieza",
+        internal: "Interna (Polvo)",
+        external: "Externa (Chasis)",
+        os: "Sistema Operativo",
+        updates: "Actualizaciones",
+        integrity: "Integridad del Sistema",
+        security: "Seguridad",
+        performance: "Rendimiento",
+        recomLoad: "Carga en Segundo Plano",
+        license: "Licencias",
         observations: "Observaciones y Recomendaciones:",
+        desc_cable: "Estado físico del cargador y cables de poder.",
+        desc_bat: "Salud del ciclo de batería y retención de carga.",
+        desc_smart: "Integridad de sectores del disco duro (S.M.A.R.T.).",
+        desc_speed: "Rendimiento de lectura/escritura y fragmentación.",
+        desc_test: "Estabilidad de los módulos de memoria RAM.",
+        desc_clean_ram: "Óxido o polvo en pines de contacto DIMM.",
+        desc_paste: "Estado del compuesto térmico en CPU/GPU.",
+        desc_fan: "Revoluciones (RPM) y limpieza del disipador.",
+        desc_int: "Polvo y obstrucciones en la placa base.",
+        desc_ext: "Limpieza profunda de chasis y carcasa.",
+        desc_upd: "Parches de seguridad y características del SO.",
+        desc_sfc: "Corrupción de archivos del núcleo (SFC/DISM).",
+        desc_av: "Protección en tiempo real y base de datos de virus.",
+        desc_fw: "Reglas de red activas y seguridad de puertos.",
+        desc_drv: "Optimización de controladores de hardware.",
+        desc_bg: "Programas de inicio innecesarios o bloatware.",
+        desc_win: "Estado de activación de la licencia de Windows.",
+        desc_off: "Licenciamiento de la suite ofimática instalada.",
         saveAsset: "💾 Guardar Activo",
         generatePlan: "📄 Generar Plan PDF",
         maintStatus: "Estado del Mantenimiento:",
@@ -127,6 +165,12 @@ const translations = {
         pdfLow: "Baja",
         pdfConfidential: "CONFIDENCIAL",
         pdfDocRef: "Ref",
+        pdfDateCol: "Fecha de Auditoría",
+        pdfCompany: "Empresa / Cliente",
+        pdfLocation: "Ubicación",
+        pdfDept: "Departamento",
+        pdfTechAuditor: "Auditor Técnico Responsable",
+        pdfManager: "Aprobación de la Contratante",
         pdfComponent: "Componente",
         pdfType: "Tipo",
         pdfFailedComponents: "Componentes con Fallas",
@@ -138,6 +182,61 @@ const translations = {
         tooltipResults: "Informe de Resultados",
         tooltipCSV: "Exportar CSV",
         tooltipPDF: "Generar PDF Inventario",
+        pdfCompanySeal: "SELLO DE LA EMPRESA",
+        pdfAuditorSign: "FIRMA DEL AUDITOR TÉCNICO",
+        pdfClientSign: "FIRMA DE APROBACIÓN",
+        pdfGeneratedBy: "Reporte generado por PocketITCheck",
+        pdfPage: "Página",
+        pdfOpSystem: "Sistema Operativo",
+        pdfProcessor: "Procesador (CPU)",
+        pdfRamMem: "Memoria RAM",
+        pdfStorage: "Almacenamiento (Disco)",
+        pdfMacAddress: "MAC Address (Wi-Fi/LAN)",
+        pdfCompra: "Compra",
+        pdfGtia: "Garantía",
+        pdfTotal: "Total:",
+        pdfStock: "Stock:",
+        pdfRepair: "Reparación:",
+        pdfSummaryBoxTitle: "Resumen de Inventario",
+        pdfSummaryActivos: "Activos",
+        pdfSummaryBaja: "Baja",
+        pdfOrigDiag: "Diagnóstico Original",
+        pdfDoneActs: "Acciones Realizadas",
+        pdfResultsTitleModel: "Informe de Resultados IT",
+        pdfMasterTitleModel: "Plan de Mantenimiento IT",
+        pdfEquipStatus: "Est",
+        pdfLocAssign: "Ubicación y Asignación",
+        pdfProbs: "Diagnóstico (Problemas)",
+        pdfReqActions: "Acciones Requeridas (Plan)",
+        act_power: "Revisar cables/cargador, batería, voltajes.",
+        act_storage: "Test SMART, comprobar velocidad, revisar conexiones.",
+        act_ram: "Test de Memoria, limpiar contactos, comprobar slots.",
+        act_temp: "Reemplazo de pasta, revisar fans/ventiladores, leer sensores.",
+        act_clean: "Mantenimiento preventivo interno y externo, limpieza de pantalla.",
+        act_os: "Actualización de sistema, revisión de integridad de archivos.",
+        act_os: "Actualización de sistema, revisión de integridad de archivos.",
+        act_security: "Escaneo de malware, parches SO, validar firewall.",
+        act_performance: "Actualizar drivers, deshabilitar inicio innecesario.",
+        act_license: "Validar activación de Windows/Office, auditar Shadow IT.",
+        pdfFaultIn: "Falla en",
+        diagL_power: "Energía (bat)",
+        diagL_storage: "Disco (smart)",
+        diagL_ram: "Memoria RAM (test)",
+        diagL_temp: "Térmico (fan)",
+        diagL_clean: "Físico (ext)",
+        diagL_os: "Sistema Operativo",
+        diagL_security: "Seguridad (av)",
+        diagL_performance: "Rendimiento (drv)",
+        diagL_license: "Licencia (off)",
+        diagN_power: "Energía/Batería",
+        diagN_storage: "Almacenamiento",
+        diagN_ram: "Memoria RAM",
+        diagN_temp: "Térmico/Fans",
+        diagN_clean: "Limpieza Física",
+        diagN_os: "Sistema Operativo",
+        diagN_security: "Seguridad/AV",
+        diagN_performance: "Rendimiento/Drivers",
+        diagN_license: "Licenciamiento",
         Pendiente: "Pendiente",
         Completado: "Completado",
         Parcial: "Parcial",
@@ -212,7 +311,45 @@ const translations = {
         integratedDiag: "🩺 Diagnostic",
         hardware: "Hardware",
         software: "Software",
+        power: "Power",
+        cables: "Cables/Charger",
+        battery: "Battery",
+        storage: "Storage",
+        speed: "Speed/Health",
+        ram: "RAM Memory",
+        contacts: "Contact Cleaning",
+        temp: "Temperature",
+        thermalPaste: "Thermal Paste",
+        fans: "Fans/Cooling",
+        clean: "Cleaning",
+        internal: "Internal (Dust)",
+        external: "External (Chassis)",
+        os: "Operating System",
+        updates: "Updates",
+        integrity: "System Integrity",
+        security: "Security",
+        performance: "Performance",
+        recomLoad: "Background Load",
+        license: "Licensing",
         observations: "Observations & Recommendations:",
+        desc_cable: "Physical condition of power adapter and cables.",
+        desc_bat: "Battery cycle health and charge retention.",
+        desc_smart: "Hard drive sector integrity (S.M.A.R.T. health).",
+        desc_speed: "Read/write performance and drive fragmentation.",
+        desc_test: "RAM module stability and error checking.",
+        desc_clean_ram: "Oxidation or dust on DIMM contact pins.",
+        desc_paste: "Thermal compound condition on CPU/GPU.",
+        desc_fan: "Heatsink fan RPM and noise levels.",
+        desc_int: "Dust and debris removal from motherboard.",
+        desc_ext: "Deep cleaning of chassis and peripherals.",
+        desc_upd: "OS security patches and feature updates.",
+        desc_sfc: "Operating system core files corruption check.",
+        desc_av: "Real-time protection and malware definitions.",
+        desc_fw: "Active network rules and port security.",
+        desc_drv: "Hardware component driver optimization.",
+        desc_bg: "Unnecessary startup programs or bloatware.",
+        desc_win: "Operating system license activation status.",
+        desc_off: "Office suite software licensing status.",
         saveAsset: "💾 Save Asset Changes",
         generatePlan: "📄 Generate PDF Plan",
         maintStatus: "Maintenance Status:",
@@ -278,6 +415,12 @@ const translations = {
         pdfLow: "Low",
         pdfConfidential: "CONFIDENTIAL",
         pdfDocRef: "Ref",
+        pdfDateCol: "Audit Date",
+        pdfCompany: "Company / Client Name",
+        pdfLocation: "Physical Location",
+        pdfDept: "Department / Area",
+        pdfTechAuditor: "Responsible Technical Auditor",
+        pdfManager: "Contracting Approval",
         pdfComponent: "Component",
         pdfType: "Type",
         pdfFailedComponents: "Failed Components",
@@ -289,6 +432,61 @@ const translations = {
         tooltipResults: "Results Report",
         tooltipCSV: "Export CSV",
         tooltipPDF: "Generate Inventory PDF",
+        pdfCompanySeal: "COMPANY SEAL",
+        pdfAuditorSign: "TECHNICAL AUDITOR SIGNATURE",
+        pdfClientSign: "CLIENT APPROVAL SIGNATURE",
+        pdfGeneratedBy: "Report generated by PocketITCheck",
+        pdfPage: "Page",
+        pdfOpSystem: "Operating System",
+        pdfProcessor: "Processor (CPU)",
+        pdfRamMem: "RAM Memory",
+        pdfStorage: "Storage (Disk)",
+        pdfMacAddress: "MAC Address (Wi-Fi/LAN)",
+        pdfCompra: "Purchase",
+        pdfGtia: "Warranty",
+        pdfTotal: "Total:",
+        pdfStock: "Stock:",
+        pdfRepair: "Repair:",
+        pdfSummaryBoxTitle: "Inventory Summary",
+        pdfSummaryActivos: "Active",
+        pdfSummaryBaja: "Decom",
+        pdfOrigDiag: "Original Diagnostic",
+        pdfDoneActs: "Performed Actions",
+        pdfResultsTitleModel: "IT Results Report",
+        pdfMasterTitleModel: "IT Maintenance Plan",
+        pdfEquipStatus: "Stat",
+        pdfLocAssign: "Location & Assign.",
+        pdfProbs: "Diagnostics (Issues)",
+        pdfReqActions: "Required Actions (Plan)",
+        act_power: "Check cables/charger, battery, voltages.",
+        act_storage: "SMART Test, check speed, review connections.",
+        act_ram: "Memory Test, clean contacts, check slots.",
+        act_temp: "Replace thermal paste, check fans, read sensors.",
+        act_clean: "Internal and external preventive maintenance, screen cleaning.",
+        act_os: "System update, system file integrity check.",
+        act_os: "System update, system file integrity check.",
+        act_security: "Malware scan, OS patches, validate firewall.",
+        act_performance: "Update drivers, disable unnecessary startup apps.",
+        act_license: "Validate Windows/Office activation, audit Shadow IT.",
+        pdfFaultIn: "Fail in",
+        diagL_power: "Power (bat)",
+        diagL_storage: "Disk (smart)",
+        diagL_ram: "RAM Memory (test)",
+        diagL_temp: "Thermal (fan)",
+        diagL_clean: "Physical (ext)",
+        diagL_os: "Operating System",
+        diagL_security: "Security (av)",
+        diagL_performance: "Performance (drv)",
+        diagL_license: "License (off)",
+        diagN_power: "Power/Battery",
+        diagN_storage: "Storage",
+        diagN_ram: "RAM Memory",
+        diagN_temp: "Thermal/Fans",
+        diagN_clean: "Physical Cleaning",
+        diagN_os: "Operating System",
+        diagN_security: "Security/AV",
+        diagN_performance: "Performance/Drivers",
+        diagN_license: "Licensing",
         Pendiente: "Pending",
         Completado: "Completed",
         Parcial: "Partial",
@@ -843,9 +1041,14 @@ function openDiagnostic(index) {
                 ${s.sub.map(subItem => {
             const isChecked = subData[subItem.id] !== undefined ? subData[subItem.id] : true;
             return `
-                    <div class="sub-check">
-                        <input type="checkbox" id="${s.id}-${subItem.id}" ${isChecked ? 'checked' : ''} onchange="checkParentStatus('${s.id}')">
-                        <label for="${s.id}-${subItem.id}">${subItem.l}</label>
+                    <div class="sub-check" style="margin-bottom: 0.8rem;">
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.1rem;">
+                            <input type="checkbox" id="${s.id}-${subItem.id}" ${isChecked ? 'checked' : ''} onchange="checkParentStatus('${s.id}')">
+                            <label for="${s.id}-${subItem.id}" style="font-weight:600;">${subItem.l}</label>
+                        </div>
+                        <div style="font-size: 0.75rem; color: #64748b; margin-left: 1.8rem; line-height: 1.2;">
+                            ${t('desc_' + (subItem.id === 'clean' ? 'clean_ram' : subItem.id))}
+                        </div>
                     </div>`;
         }).join('')}
             </div>
@@ -958,117 +1161,132 @@ function exportToCSV() {
     link.click();
 }
 
-// ========== PDF HELPERS ==========
+// ========== PDF HELPERS (MODEL-ACCURATE) ==========
 
-function generateDocRef() {
-    const d = new Date();
-    const pad = n => String(n).padStart(2, '0');
-    return `REF-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+function drawSubheader(doc, o, startY) {
+    const pw = doc.internal.pageSize.getWidth();
+
+    const boxHeight = 16;
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(14, startY - 4, pw - 28, boxHeight, 2, 2, 'FD');
+
+    const drawLine = (labelKey, value, x, y) => {
+        const labelText = `${tPdf(labelKey)}: `;
+        doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(71, 85, 105);
+        doc.text(labelText, x, y);
+        const w = doc.getTextWidth(labelText);
+        doc.setFont("helvetica", "normal"); doc.setTextColor(15, 23, 42);
+        doc.text(value || '-', x + w + 1, y);
+    };
+
+    // Col 1
+    drawLine('pdfCompany', o.company, 18, startY + 1);
+    drawLine('pdfLocation', o.location, 18, startY + 7);
+
+    // Col 2
+    const col2 = pw * 0.36;
+    drawLine('pdfDept', o.depto, col2, startY + 1);
+    drawLine('pdfTechAuditor', o.auditor, col2, startY + 7);
+
+    // Col 3
+    const col3 = pw * 0.68;
+    drawLine('pdfManager', `${o.manager || '-'} (${o.managerTitle || ''})`, col3, startY + 4);
+
+    return startY + boxHeight + 3;
 }
 
-function drawPdfHeader(doc, title, color, o) {
+function drawHeaderTypeA(doc, title, color, rightTextLines) {
     const pw = doc.internal.pageSize.getWidth();
-    // Header bar
-    doc.setFillColor(...color);
-    doc.rect(0, 0, pw, 30, 'F');
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.setTextColor(255, 255, 255);
-    doc.text(title, 15, 13);
-    // Doc ref in header
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${tPdf('pdfDocRef')}: ${generateDocRef()}`, 15, 22);
-    doc.text(`${tPdf('pdfDate')}: ${o.auditDate || new Date().toLocaleDateString()}`, 15, 27);
+    // Solid Bar
+    doc.setFillColor(...color); doc.rect(0, 0, pw, 26, 'F');
+    // Accent line
+    doc.setFillColor(4, 120, 87); doc.rect(0, 26, pw, 1.5, 'F');
 
-    // Company info — left column
-    doc.setTextColor(15, 23, 42);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text(`${tPdf('companyLabel')}: ${o.company}`, 15, 38);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${tPdf('deptLabel')}: ${o.depto || '-'}`, 15, 43);
-    doc.text(`${tPdf('locationLabel')}: ${o.location || '-'}`, 15, 48);
+    // Title
+    doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(255, 255, 255);
+    doc.text(title, 15, 16);
 
-    // Right column
-    const rx = pw / 2 + 10;
-    doc.setFont("helvetica", "bold");
-    doc.text(`${tPdf('techAuditor')}: ${o.auditor}`, rx, 38);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${tPdf('auditCompanyLabel')}: ${o.auditorCompany || '-'}`, rx, 43);
-    doc.text(`${tPdf('managerLabel')}: ${o.manager || '-'} - ${o.managerTitle || ''}`, rx, 48);
+    // App text
+    doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(167, 243, 208);
+    doc.text("PocketITCheck \u2022 v1.0", 15, 22);
 
-    // Thin divider
-    doc.setDrawColor(200, 200, 200);
-    doc.line(15, 52, pw - 15, 52);
-    return 56;
-}
-
-function drawPdfDashboard(doc, stats, startY, color) {
-    const pw = doc.internal.pageSize.getWidth();
-    const boxW = (pw - 30 - (stats.length - 1) * 6) / stats.length;
-    let x = 15;
-    stats.forEach(s => {
-        // Background
-        doc.setFillColor(...(s.color || color), 0.12);
-        doc.setFillColor(s.bgR || color[0], s.bgG || color[1], s.bgB || color[2]);
-        doc.roundedRect(x, startY, boxW, 18, 3, 3, 'F');
-        // Value
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
-        doc.setTextColor(s.textR || 15, s.textG || 23, s.textB || 42);
-        doc.text(String(s.value), x + boxW / 2, startY + 8, { align: 'center' });
-        // Label
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(7);
-        doc.setTextColor(100, 116, 139);
-        doc.text(s.label, x + boxW / 2, startY + 14, { align: 'center' });
-        x += boxW + 6;
+    // Right lines
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255);
+    let y = 14;
+    rightTextLines.forEach((line, idx) => {
+        if (idx > 0) { doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(230, 240, 235); }
+        doc.text(line, pw - 15, y, { align: 'right' });
+        y += 6;
     });
-    return startY + 24;
+    return 36;
 }
 
-function drawPdfSignatures(doc, startY, o) {
+function drawHeaderTypeB(doc, title, o, statsTextLines) {
+    const pw = doc.internal.pageSize.getWidth();
+    // Solid Bar (Green)
+    doc.setFillColor(5, 150, 105); doc.rect(0, 0, pw, 26, 'F');
+    // Accent line
+    doc.setFillColor(4, 120, 87); doc.rect(0, 26, pw, 1.5, 'F');
+
+    // Title
+    doc.setFont("helvetica", "bold"); doc.setFontSize(20); doc.setTextColor(255, 255, 255);
+    doc.text(title, 15, 16);
+    doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(167, 243, 208);
+    doc.text(`PocketITCheck \u2022 ${tPdf('pdfDateCol')}: ${o.auditDate || new Date().toLocaleDateString()}`, 15, 22);
+
+    // Stats Box
+    const boxW = 85; const boxX = pw - boxW - 15; const boxY = 4;
+    doc.setDrawColor(16, 185, 129); doc.setLineWidth(0.3);
+    doc.setFillColor(4, 120, 87);
+    doc.roundedRect(boxX, boxY, boxW, 18, 1.5, 1.5, 'FD');
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(255, 255, 255);
+    doc.text(statsTextLines[0], boxX + 4, boxY + 6);
+    doc.setFont("helvetica", "normal"); doc.setTextColor(230, 240, 235);
+    doc.text(statsTextLines[1], boxX + 4, boxY + 11);
+    if (statsTextLines[2]) doc.text(statsTextLines[2], boxX + 4, boxY + 15);
+
+    return 36;
+}
+
+function drawModelSignatures(doc, startY, o) {
     const pw = doc.internal.pageSize.getWidth();
     const ph = doc.internal.pageSize.getHeight();
     let y = startY;
-    if (y + 70 > ph - 15) { doc.addPage(); y = 30; }
+    if (y + 50 > ph - 15) { doc.addPage(); y = 30; }
 
     y += 15;
-    doc.setDrawColor(80, 80, 80);
-    doc.setTextColor(40, 40, 40);
+    // Sello text centered ABOVE signatures
+    doc.setFont("helvetica", "bold"); doc.setFontSize(7); doc.setTextColor(130, 130, 130);
+    doc.text(tPdf('pdfCompanySeal'), pw / 2, y, { align: 'center' });
+
+    y += 20;
+    doc.setDrawColor(80, 80, 80); doc.setTextColor(15, 23, 42);
 
     // Auditor signature — left
     const sig1X = pw * 0.25;
     doc.line(sig1X - 45, y, sig1X + 45, y);
     doc.setFont("helvetica", "bold"); doc.setFontSize(8);
-    doc.text(o.auditor || '-', sig1X, y + 5, { align: 'center' });
-    doc.setFont("helvetica", "normal"); doc.setFontSize(7);
-    doc.text(tPdf('pdfPerformedBy'), sig1X, y + 10, { align: 'center' });
-    doc.text(tPdf('pdfAuditorSign'), sig1X, y + 14, { align: 'center' });
+    doc.text(tPdf('pdfAuditorSign'), sig1X, y + 5, { align: 'center' });
+    doc.setFont("helvetica", "normal");
+    doc.text(o.auditor || '-', sig1X, y + 10, { align: 'center' });
+    doc.setFont("helvetica", "bold"); doc.setFontSize(7); doc.setTextColor(100, 116, 139);
+    doc.text((o.auditorCompany || '').toUpperCase(), sig1X, y + 14, { align: 'center' });
 
     // Client/Manager signature — right
     const sig2X = pw * 0.75;
+    doc.setTextColor(15, 23, 42);
     doc.line(sig2X - 45, y, sig2X + 45, y);
     doc.setFont("helvetica", "bold"); doc.setFontSize(8);
-    doc.text(`${o.manager || '-'}`, sig2X, y + 5, { align: 'center' });
-    doc.setFont("helvetica", "normal"); doc.setFontSize(7);
-    doc.text(o.managerTitle || '', sig2X, y + 10, { align: 'center' });
-    doc.text(tPdf('pdfApprovedBy') + ' - ' + tPdf('pdfClientSign'), sig2X, y + 14, { align: 'center' });
-
-    // Company seal — centered below
-    const sealY = y + 30;
-    const sealX = pw / 2;
-    doc.setDrawColor(160, 160, 160);
-    doc.setLineDashPattern([2, 2], 0);
-    doc.circle(sealX, sealY, 16);
-    doc.setLineDashPattern([], 0);
-    doc.setFontSize(7);
-    doc.setTextColor(130, 130, 130);
-    doc.text(tPdf('pdfCompanySeal'), sealX, sealY + 1, { align: 'center' });
+    doc.text(tPdf('pdfClientSign'), sig2X, y + 5, { align: 'center' });
+    doc.setFont("helvetica", "normal");
+    doc.text((o.manager || '-').toUpperCase(), sig2X, y + 10, { align: 'center' });
+    doc.setFont("helvetica", "bold"); doc.setFontSize(7); doc.setTextColor(100, 116, 139);
+    doc.text((o.managerTitle || '').toUpperCase(), sig2X, y + 14, { align: 'center' });
 }
 
-function addPdfPageNumbers(doc) {
+function addModelPageNumbers(doc) {
     const totalPages = doc.internal.getNumberOfPages();
     const pw = doc.internal.pageSize.getWidth();
     const ph = doc.internal.pageSize.getHeight();
@@ -1077,9 +1295,8 @@ function addPdfPageNumbers(doc) {
         doc.setFontSize(7);
         doc.setFont("helvetica", "italic");
         doc.setTextColor(150, 150, 150);
-        doc.text(tPdf('pdfGeneratedBy'), 15, ph - 7);
-        doc.text(tPdf('pdfConfidential'), pw / 2, ph - 7, { align: 'center' });
-        doc.text(`${tPdf('pdfPage')} ${i} ${tPdf('pdfOf')} ${totalPages}`, pw - 15, ph - 7, { align: 'right' });
+        doc.text(`${tPdf('pdfGeneratedBy')} | https://raziel986.github.io/PocketITCheck/`, 15, ph - 7);
+        doc.text(`${tPdf('pdfPage')} ${i}`, pw - 15, ph - 7, { align: 'right' });
     }
 }
 
@@ -1100,46 +1317,69 @@ function exportToPDF() {
     const o = getActiveOffice(); if (!o || !o.inventory.length || !window.jspdf) return;
     const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
 
-    let y = drawPdfHeader(doc, tPdf('pdfInventoryTitle'), [79, 70, 229], o);
-
-    // Dashboard
+    // Stats for Header B
     const active = o.inventory.filter(i => i.status === 'Activo').length;
     const stock = o.inventory.filter(i => i.status === 'Stock').length;
-    const repair = o.inventory.filter(i => i.status === 'Reparaci\u00f3n').length;
+    const repair = o.inventory.filter(i => i.status === 'Reparación').length;
     const decom = o.inventory.filter(i => i.status === 'Baja').length;
-    y = drawPdfDashboard(doc, [
-        { value: o.inventory.length, label: tPdf('pdfTotalItems'), bgR: 241, bgG: 245, bgB: 249 },
-        { value: active, label: tPdf('Activo'), bgR: 209, bgG: 250, bgB: 229, textR: 5, textG: 150, textB: 105 },
-        { value: stock, label: tPdf('Stock'), bgR: 219, bgG: 234, bgB: 254, textR: 37, textG: 99, textB: 235 },
-        { value: repair, label: tPdf('Reparaci\u00f3n'), bgR: 254, bgG: 243, bgB: 199, textR: 217, textG: 119, textB: 6 },
-        { value: decom, label: tPdf('Baja'), bgR: 254, bgG: 226, bgB: 226, textR: 220, textG: 38, textB: 38 }
-    ], y, [79, 70, 229]);
+    const statsLines = [
+        tPdf('pdfSummaryBoxTitle'),
+        `${tPdf('pdfTotal')} ${o.inventory.length} | ${tPdf('pdfSummaryActivos')}: ${active} | ${tPdf('pdfStock')} ${stock}`,
+        `${tPdf('pdfRepair')} ${repair} | ${tPdf('pdfSummaryBaja')}: ${decom}`
+    ];
+
+    let y = drawHeaderTypeB(doc, tPdf('pdfInventoryTitle'), o, statsLines);
+    y = drawSubheader(doc, o, y + 5);
 
     doc.autoTable({
-        head: [[tPdf('assetTagLabel'), tPdf('pdfCategory'), tPdf('pdfModel'), 'S/N', tPdf('pdfStatus'), tPdf('pdfUser'), tPdf('techSpecs')]],
-        body: o.inventory.map(i => [
-            i.assetTag, tPdf(i.typeValue || i.type), i.model, i.serial,
-            tPdf(i.status), i.user, i.baseNotes || i.notes || '-'
-        ]),
+        head: [['ID Activo', tPdf('pdfStatus'), tPdf('pdfCategory') + ' / ' + tPdf('pdfModel'), 'S/N / ' + tPdf('pdfUser'), tPdf('pdfEquipDetail')]],
+        body: o.inventory.map(i => {
+            const specs = [];
+            // Try to extract dynamic data or fallback
+            const os = i.dynamicData && i.dynamicData.dyn_os ? i.dynamicData.dyn_os : '-';
+            const cpu = i.dynamicData && i.dynamicData.dyn_cpu ? i.dynamicData.dyn_cpu : '-';
+            const ram = i.dynamicData && i.dynamicData.dyn_ram ? i.dynamicData.dyn_ram : '-';
+            const disk = i.dynamicData && i.dynamicData.dyn_storage ? i.dynamicData.dyn_storage : '-';
+            const mac = i.dynamicData && i.dynamicData.dyn_mac ? i.dynamicData.dyn_mac : '-';
+            const baseNotes = i.baseNotes || i.notes || '-';
+
+            // Format 1: Computers
+            if (i.type === 'Laptop' || i.type === 'Desktop') {
+                specs.push(`${tPdf('pdfOpSystem')}: ${os} | ${tPdf('pdfProcessor')}: ${cpu} | ${tPdf('pdfRamMem')}: ${ram} | ${tPdf('pdfStorage')}: ${disk} | ${tPdf('pdfMacAddress')}: ${mac} | ${tPdf('pdfNotes')}: ${baseNotes}`);
+            } else {
+                specs.push(i.notes || '-');
+            }
+
+            // Warranty Line
+            const wLine = `[${tPdf('pdfCompra')}: ${i.purchaseDate || 'N/A'} - ${tPdf('pdfGtia')}: ${i.warrantyDate || 'N/A'}]`;
+            specs.push(wLine);
+
+            return [
+                i.assetTag,
+                i.status,
+                `${tPdf(i.typeValue || i.type)}\n${i.model}`,
+                `S/N: ${i.serial}\nUsu: ${i.user}`,
+                specs.join('\n')
+            ];
+        }),
         startY: y,
         theme: 'grid',
-        headStyles: { fillColor: [79, 70, 229], fontSize: 8, textColor: 255 },
+        headStyles: { fillColor: [5, 150, 105], fontSize: 8, textColor: 255 }, // Green header
         bodyStyles: { fontSize: 7.5 },
         alternateRowStyles: { fillColor: [248, 250, 252] },
         margin: { bottom: 30, left: 15, right: 15 },
         styles: { cellPadding: 2.5, overflow: 'linebreak' },
-        didParseCell: (data) => {
-            if (data.section === 'body' && data.column.index === 4) {
-                const raw = data.row.raw[4];
-                const sc = getStatusColor(o.inventory[data.row.index] ? o.inventory[data.row.index].status : '');
-                data.cell.styles.textColor = sc;
-                data.cell.styles.fontStyle = 'bold';
-            }
+        columnStyles: {
+            0: { cellWidth: 20 },
+            1: { cellWidth: 25 },
+            2: { cellWidth: 35 },
+            3: { cellWidth: 40 }
+            // 4 auto width
         }
     });
 
-    drawPdfSignatures(doc, doc.lastAutoTable.finalY + 15, o);
-    addPdfPageNumbers(doc);
+    drawModelSignatures(doc, doc.lastAutoTable.finalY + 15, o);
+    addModelPageNumbers(doc);
     doc.save(`Inventario_${o.company}.pdf`);
 }
 
@@ -1241,136 +1481,177 @@ async function generateMaintenancePlanPDF(idx) {
 
 // ========== 3. MASTER MAINTENANCE PLAN PDF ==========
 
+const actionMap = {
+    power: "Revisar cables/cargador, batería, voltajes.",
+    storage: "Test SMART, comprobar velocidad, revisar conexiones.",
+    ram: "Test de Memoria, limpiar contactos, comprobar slots.",
+    temp: "Reemplazo de pasta, revisar fans/ventiladores, leer sensores.",
+    clean: "Mantenimiento preventivo interno y externo, limpieza de pantalla.",
+    os: "Actualización de sistema, revisión de integridad de archivos.",
+    security: "Escaneo de malware, parches SO, validar firewall.",
+    performance: "Actualizar drivers, deshabilitar inicio innecesario.",
+    license: "Validar activación de Windows/Office, auditar Shadow IT.",
+    cable: "Reemplazar o chequear cableado de poder.",
+    bat: "Ciclos de batería superados, se requiere cambio.",
+    smart: "Advertencia SMART, back-up inmediato necesario.",
+    speed: "Lentitud detectada, revisar Fragmentación/TRIM.",
+    test: "Errores lógicos en MemTest, módulo defectuoso.",
+    contacts: "Óxido/Polvo en contactos DIMM, requiere limpieza.",
+    paste: "Degradación térmica térmica, repasteo urgente.",
+    fan: "Ventilador obstruido o ruidoso, necesita lubricación/cambio.",
+    int: "Exceso de polvo interno, requiere soplado profundo.",
+    ext: "Chasis/Periféricos sucios, requiere limpieza con alcohol.",
+    upd: "Faltan actualizaciones críticas del OS.",
+    sfc: "Corrupción de archivos SFC/DISM encontrado.",
+    av: "Definiciones de virus obsoletas o agente apagado.",
+    fw: "Reglas de firewall no aplicadas o ausentes.",
+    drv: "Drivers de GPU/Chipset genéricos u obsoletos.",
+    bg: "Alta carga de procesos en segundo plano (Bloatware).",
+    win: "Windows sin activar o licencia expirando.",
+    off: "Office sin activar o requiere inicio de sesión."
+};
+
+const diagLabelMap = {
+    power: "Energía (bat)", storage: "Disco (smart)", ram: "Memoria RAM (test)",
+    temp: "Térmico (fan)", clean: "Físico (ext)", os: "Sistema Operativo",
+    security: "Seguridad (av)", performance: "Rendimiento (drv)", license: "Licencia (off)"
+};
+
 async function generateMasterMaintenancePlanPDF() {
     const o = getActiveOffice(); if (!o) return;
-    const items = o.inventory.filter(i => i.status === 'Reparaci\u00f3n' || (i.diagnostics && (Object.values(i.diagnostics.hardware).includes(false) || Object.values(i.diagnostics.software).includes(false))));
+    const items = o.inventory.filter(i => i.status === 'Reparación' || (i.diagnostics && (Object.values(i.diagnostics.hardware).includes(false) || Object.values(i.diagnostics.software).includes(false))));
     if (!items.length) return Swal.fire(tPdf('pdfPendingItems'), '', 'info');
     const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
 
-    let y = drawPdfHeader(doc, tPdf('pdfMasterPlanTitle'), [5, 150, 105], o);
-
-    // Dashboard
-    y = drawPdfDashboard(doc, [
-        { value: items.length, label: tPdf('pdfTotalItems'), bgR: 241, bgG: 245, bgB: 249 },
-        { value: items.filter(i => i.status === 'Reparaci\u00f3n').length, label: tPdf('Reparaci\u00f3n'), bgR: 254, bgG: 243, bgB: 199, textR: 217, textG: 119, textB: 6 }
-    ], y, [5, 150, 105]);
-
-    // Build rows with priority and failed components
-    const body = items.map(i => {
-        let failedComps = [];
-        if (i.diagnostics) {
-            Object.keys(i.diagnostics.hardware).forEach(k => { if (!i.diagnostics.hardware[k]) failedComps.push(tPdf(k)); });
-            Object.keys(i.diagnostics.software).forEach(k => { if (!i.diagnostics.software[k]) failedComps.push(tPdf(k)); });
-        }
-        const priority = failedComps.length >= 4 ? tPdf('pdfHigh') : failedComps.length >= 2 ? tPdf('pdfMedium') : tPdf('pdfLow');
-        return [i.assetTag, tPdf(i.typeValue || i.type), i.model, i.user, failedComps.join(', ') || '-', priority, tPdf(i.status)];
-    });
+    const rightText = [
+        `${tPdf('pdfDateCol')}: ${o.auditDate || new Date().toLocaleDateString()}`,
+        `${tPdf('equips')}: ${items.length}`
+    ];
+    let y = drawHeaderTypeA(doc, tPdf('pdfMasterTitleModel'), [5, 150, 105], rightText); // Greenish bar
+    y = drawSubheader(doc, o, y + 5);
 
     doc.autoTable({
-        head: [['ID', tPdf('pdfCategory'), tPdf('pdfModel'), tPdf('pdfUser'), tPdf('pdfFailedComponents'), tPdf('pdfPriority'), tPdf('pdfStatus')]],
-        body: body,
+        head: [['N°', tPdf('pdfEquip'), tPdf('pdfLocAssign'), tPdf('pdfProbs'), tPdf('pdfReqActions')]],
+        body: items.map((i, index) => {
+            let faults = [];
+            let actions = [];
+
+            if (i.diagnostics) {
+                // Check Main Hardware
+                Object.keys(i.diagnostics.hardware).forEach(k => {
+                    if (!i.diagnostics.hardware[k]) {
+                        faults.push(`• ${tPdf('pdfFaultIn')} ${tPdf('diagL_' + k) || diagLabelMap[k] || k}`);
+                        actions.push(`• ${tPdf(`act_${k}`)}`);
+                    }
+                });
+                // Check Main Software
+                Object.keys(i.diagnostics.software).forEach(k => {
+                    if (!i.diagnostics.software[k]) {
+                        faults.push(`• ${tPdf('pdfFaultIn')} ${tPdf('diagL_' + k) || diagLabelMap[k] || k}`);
+                        actions.push(`• ${tPdf(`act_${k}`)}`);
+                    }
+                });
+            }
+
+            return [
+                index + 1,
+                `ID: ${i.assetTag}\n${t('type')}: ${tPdf(i.typeValue || i.type)}\nMod: ${i.model}`,
+                `${tPdf('pdfEquipStatus')}: ${tPdf(i.status)}\n${tPdf('deptLabel')}: ${o.depto || '-'}\nAsig: ${i.user || 'N/A'}`,
+                faults.join('\n') || '-',
+                actions.join('\n') || '-'
+            ];
+        }),
         startY: y,
         theme: 'grid',
-        headStyles: { fillColor: [5, 150, 105], fontSize: 7.5, textColor: 255 },
-        bodyStyles: { fontSize: 7 },
+        headStyles: { fillColor: [5, 150, 105], fontSize: 9, textColor: 255 }, // Green table header
+        bodyStyles: { fontSize: 8 },
         alternateRowStyles: { fillColor: [248, 250, 252] },
         margin: { bottom: 30, left: 15, right: 15 },
-        didParseCell: (data) => {
-            if (data.section === 'body' && data.column.index === 5) {
-                const val = data.cell.raw;
-                if (val === tPdf('pdfHigh')) { data.cell.styles.textColor = [220, 38, 38]; data.cell.styles.fontStyle = 'bold'; }
-                else if (val === tPdf('pdfMedium')) { data.cell.styles.textColor = [217, 119, 6]; data.cell.styles.fontStyle = 'bold'; }
-                else { data.cell.styles.textColor = [16, 185, 129]; }
-            }
+        styles: { cellPadding: 3, overflow: 'linebreak' },
+        columnStyles: {
+            0: { cellWidth: 10, halign: 'center' },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 40 },
+            3: { cellWidth: 50 }
+            // 4 auto
         }
     });
 
-    drawPdfSignatures(doc, doc.lastAutoTable.finalY + 15, o);
-    addPdfPageNumbers(doc);
+    drawModelSignatures(doc, doc.lastAutoTable.finalY + 15, o);
+    addModelPageNumbers(doc);
     doc.save(`PlanMaestro_${o.company}.pdf`);
 }
 
 // ========== 4. RESULTS REPORT PDF ==========
 
+const diagNameMap = {
+    power: "Energía/Batería", storage: "Almacenamiento", ram: "Memoria RAM",
+    temp: "Térmico/Fans", clean: "Limpieza Física", os: "Sistema Operativo",
+    security: "Seguridad/AV", performance: "Rendimiento/Drivers", license: "Licenciamiento"
+};
+
 async function generateResultsReportPDF() {
     const o = getActiveOffice(); const items = o.inventory.filter(i => i.maintenanceResult);
     if (!items.length) return Swal.fire(tPdf('pdfResultsTitle'), '', 'info');
-    const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4');
+    const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
 
-    let y = drawPdfHeader(doc, tPdf('pdfResultsTitle'), [5, 150, 105], o);
+    const rightText = [
+        `${tPdf('pdfDateCol')}: ${o.auditDate || new Date().toLocaleDateString()}`,
+        `${tPdf('equips')}: ${items.length}`
+    ];
+    let y = drawHeaderTypeA(doc, tPdf('pdfResultsTitleModel'), [5, 150, 105], rightText); // Green bar
+    y = drawSubheader(doc, o, y + 5);
 
-    // Dashboard
-    const completed = items.filter(i => i.maintenanceResult.status === 'Completado').length;
-    const partial = items.filter(i => i.maintenanceResult.status === 'Parcial').length;
-    const pending = items.filter(i => i.maintenanceResult.status === 'Pendiente').length;
-    const rate = items.length > 0 ? Math.round((completed / items.length) * 100) : 0;
-    y = drawPdfDashboard(doc, [
-        { value: items.length, label: tPdf('pdfTotalItems'), bgR: 241, bgG: 245, bgB: 249 },
-        { value: completed, label: tPdf('Completado'), bgR: 209, bgG: 250, bgB: 229, textR: 5, textG: 150, textB: 105 },
-        { value: partial, label: tPdf('Parcial'), bgR: 254, bgG: 243, bgB: 199, textR: 217, textG: 119, textB: 6 },
-        { value: pending, label: tPdf('Pendiente'), bgR: 254, bgG: 226, bgB: 226, textR: 220, textG: 38, textB: 38 },
-        { value: rate + '%', label: tPdf('pdfCompletionRate'), bgR: 224, bgG: 231, bgB: 255, textR: 79, textG: 70, textB: 229 }
-    ], y, [5, 150, 105]);
+    doc.autoTable({
+        head: [['N°', tPdf('pdfEquip'), tPdf('pdfOrigDiag'), tPdf('pdfDoneActs'), tPdf('pdfStatusCol'), tPdf('pdfDateCol')]],
+        body: items.map((i, index) => {
+            const mr = i.maintenanceResult;
+            let orig = [];
+            let actions = [];
 
-    // Per-equipment detail
-    items.forEach((item, idx) => {
-        const mr = item.maintenanceResult;
-        const diag = item.diagnostics;
-
-        // Section header
-        if (y > doc.internal.pageSize.getHeight() - 60) { doc.addPage(); y = 20; }
-        doc.setFillColor(248, 250, 252);
-        doc.roundedRect(15, y, 180, 14, 2, 2, 'F');
-        doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(15, 23, 42);
-        doc.text(`${item.assetTag} - ${tPdf(item.typeValue || item.type)} - ${item.model}`, 20, y + 5);
-        doc.setFont("helvetica", "normal"); doc.setFontSize(8);
-        doc.text(`${tPdf('pdfUser')}: ${item.user}  |  ${tPdf('pdfDate')}: ${mr.date}  |  ${tPdf('pdfStatus')}: ${tPdf(mr.status)}`, 20, y + 11);
-        const sc = getStatusColor(mr.status);
-        doc.setTextColor(...sc);
-        doc.text(tPdf(mr.status), 170, y + 5);
-        y += 18;
-
-        // Fault resolution table
-        if (diag && mr.resolvedItems) {
-            const allKeys = [...Object.keys(diag.hardware), ...Object.keys(diag.software)];
-            const faultKeys = allKeys.filter(k => diag.hardware[k] === false || diag.software[k] === false);
-            if (faultKeys.length > 0) {
-                const faultRows = faultKeys.map(k => [
-                    tPdf(k),
-                    diag.hardware[k] !== undefined ? 'Hardware' : 'Software',
-                    mr.resolvedItems[k] ? tPdf('pdfResolved') : tPdf('pdfPending')
-                ]);
-                doc.autoTable({
-                    head: [[tPdf('pdfComponent'), tPdf('pdfType'), tPdf('pdfStatus')]],
-                    body: faultRows,
-                    startY: y,
-                    theme: 'grid',
-                    headStyles: { fillColor: [100, 116, 139], fontSize: 8, textColor: 255 },
-                    bodyStyles: { fontSize: 7.5 },
-                    margin: { left: 20, right: 20, bottom: 30 },
-                    tableWidth: 170,
-                    didParseCell: (data) => {
-                        if (data.section === 'body' && data.column.index === 2) {
-                            data.cell.styles.textColor = data.cell.raw === tPdf('pdfResolved') ? [16, 185, 129] : [239, 68, 68];
-                            data.cell.styles.fontStyle = 'bold';
-                        }
+            if (i.diagnostics && mr.resolvedItems) {
+                const allKeys = [...Object.keys(i.diagnostics.hardware), ...Object.keys(i.diagnostics.software)];
+                allKeys.forEach(k => {
+                    if (i.diagnostics.hardware[k] === false || i.diagnostics.software[k] === false) {
+                        const name = tPdf('diagN_' + k) || diagNameMap[k] || k;
+                        orig.push(`• ${name}`);
+                        const resText = mr.resolvedItems[k] ? `[${tPdf('pdfResolved')}]` : `[${t('Pendiente')}]`;
+                        actions.push(`${resText} ${name}`);
                     }
                 });
-                y = doc.lastAutoTable.finalY + 4;
             }
-        }
 
-        // Tech notes
-        if (mr.techNotes) {
-            doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(100, 116, 139);
-            doc.text(`${tPdf('pdfNotes')}: ${mr.techNotes}`, 20, y + 2, { maxWidth: 170 });
-            y += 10;
+            if (mr.techNotes) {
+                actions.push(`[${tPdf('pdfObs')}]: ${mr.techNotes}`);
+            }
+
+            return [
+                index + 1,
+                `ID: ${i.assetTag}\n${t('type')}: ${tPdf(i.typeValue || i.type)}\nMod: ${i.model}`,
+                orig.join('\n') || '-',
+                actions.join('\n') || '-',
+                `[OK]\n${tPdf(mr.status)}`,
+                mr.date
+            ];
+        }),
+        startY: y,
+        theme: 'grid',
+        headStyles: { fillColor: [5, 150, 105], fontSize: 9, textColor: 255, halign: 'center' },
+        bodyStyles: { fontSize: 8 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        margin: { bottom: 30, left: 15, right: 15 },
+        styles: { cellPadding: 3, overflow: 'linebreak' },
+        columnStyles: {
+            0: { cellWidth: 10, halign: 'center' },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 40 },
+            4: { cellWidth: 25, halign: 'center' },
+            5: { cellWidth: 25, halign: 'center' }
         }
-        y += 4;
     });
 
-    drawPdfSignatures(doc, y + 10, o);
-    addPdfPageNumbers(doc);
+    drawModelSignatures(doc, doc.lastAutoTable.finalY + 15, o);
+    addModelPageNumbers(doc);
     doc.save(`Resultados_${o.company}.pdf`);
 }
 
