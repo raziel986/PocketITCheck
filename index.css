@@ -293,7 +293,8 @@
             display: inline-block;
             width: 100%;
         }
-        #company{
+
+        #company {
             margin-top: 30px;
             font-size: 1.5rem;
             font-weight: 600;
@@ -713,8 +714,6 @@
                 display: none !important;
             }
         }
-
-        /* Splash Screen / Loader Premium */
 
         /* Integrated Diagnostic Section */
         #diag-integrated-section {
