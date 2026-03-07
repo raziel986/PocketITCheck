@@ -380,11 +380,13 @@
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
                     <button class="icon-btn icon-btn-info" title="Plan Maestro de Mantenimiento"
-                        onclick="generateMasterMaintenancePlanPDF()">📊</button>
+                        data-i18n-title="tooltipMasterPlan" onclick="generateMasterMaintenancePlanPDF()">📊</button>
                     <button class="icon-btn icon-btn-info" title="Informe de Resultados"
-                        onclick="generateResultsReportPDF()">📈</button>
-                    <button class="icon-btn icon-btn-info" title="Exportar CSV" onclick="exportToCSV()">📂</button>
-                    <button class="icon-btn icon-btn-info" title="Generar PDF" onclick="exportToPDF()">📄</button>
+                        data-i18n-title="tooltipResults" onclick="generateResultsReportPDF()">📈</button>
+                    <button class="icon-btn icon-btn-info" title="Exportar CSV" data-i18n-title="tooltipCSV"
+                        onclick="exportToCSV()">📂</button>
+                    <button class="icon-btn icon-btn-info" title="Generar PDF" data-i18n-title="tooltipPDF"
+                        onclick="exportToPDF()">📄</button>
                 </div>
             </h2>
 
