@@ -13,6 +13,7 @@
     <style>
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -22,11 +23,16 @@
             --danger-hover: #dc2626;
             --success: #10b981;
             --success-hover: #059669;
-            --bg-gradient: linear-gradient(135deg, #f0fdfa 0%, #e0e7ff 100%);
-            --glass-bg: rgba(255, 255, 255, 0.9);
-            --glass-border: rgba(255, 255, 255, 0.5);
+            --info: #3b82f6;
+            --info-hover: #2563eb;
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.6);
             --text-main: #0f172a;
             --text-light: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
         body {
@@ -34,13 +40,14 @@
             background: var(--bg-gradient);
             color: var(--text-main);
             margin: 0;
-            padding: 2rem;
+            padding: 0.75rem;
             min-height: 100vh;
+            line-height: 1.5;
         }
 
-        @media (max-width: 640px) {
+        @media (min-width: 768px) {
             body {
-                padding: 1rem;
+                padding: 2rem;
             }
         }
 
@@ -51,9 +58,16 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 350px 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                display: grid;
+                grid-template-columns: 380px 1fr;
+            }
         }
 
         .sidebar {
@@ -62,20 +76,21 @@
             gap: 1.5rem;
         }
 
-        @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        @media (min-width: 768px) {
+            .glass-card {
+                padding: 2rem;
+            }
         }
 
         h1,
@@ -92,7 +107,7 @@
 
         label {
             display: block;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             font-weight: 500;
             margin-bottom: 0.5rem;
             color: var(--text-main);
@@ -101,31 +116,34 @@
         input,
         select {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            box-sizing: border-box;
+            max-width: 100%;
+            min-width: 0;
+            height: 48px;
+            padding: 0 .5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
             font-family: inherit;
             background: #ffffff;
             outline: none;
             transition: all 0.2s ease;
+            font-size: 1rem;
         }
 
         input:focus,
         select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
         .form-grid-2 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            grid-template-columns: 1fr;
+            gap: 4px;
         }
 
-        @media (max-width: 768px) {
+        @media (min-width: 600px) {
             .form-grid-2 {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -137,25 +155,24 @@
         }
 
         .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.875rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.95rem;
+            min-height: 48px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
             width: 100%;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            border: none;
+            color: white;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px -1px rgba(0, 0, 0, 0.15);
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-submit {
@@ -164,14 +181,16 @@
 
         .btn-submit:hover {
             background-color: var(--primary-hover);
+            box-shadow: var(--shadow-lg);
         }
 
-        .btn-print {
-            background-color: #64748b;
+        .btn-info {
+            background-color: var(--info);
         }
 
-        .btn-print:hover {
-            background-color: #475569;
+        .btn-info:hover {
+            background-color: var(--info-hover);
+            box-shadow: var(--shadow-lg);
         }
 
         .btn-excel {
@@ -180,6 +199,7 @@
 
         .btn-excel:hover {
             background-color: var(--success-hover);
+            box-shadow: var(--shadow-lg);
         }
 
         .btn-pdf {
@@ -188,6 +208,16 @@
 
         .btn-pdf:hover {
             background-color: var(--danger-hover);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-print {
+            background-color: #64748b;
+        }
+
+        .btn-print:hover {
+            background-color: #475569;
+            box-shadow: var(--shadow-lg);
         }
 
         .btn-clear {
@@ -204,27 +234,71 @@
         .btn-delete {
             background: #fee2e2;
             color: var(--danger);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+            border: 1px solid #fecaca;
+            min-height: 40px;
             padding: 0.5rem 0.75rem;
-            font-size: 0.85rem;
+            border-radius: 8px;
             font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
             transition: all 0.2s;
         }
 
         .btn-delete:hover {
-            background: #f87171;
+            background: var(--danger);
             color: white;
+            border-color: var(--danger);
             transform: scale(1.05);
         }
 
-        /* Tooltip Offline */
         .btn-pdf:disabled {
             background-color: #94a3b8;
             cursor: not-allowed;
             transform: none !important;
             box-shadow: none !important;
+        }
+
+        /* Icon Action Buttons (Linear Layout) */
+        .action-icons {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.15rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.15);
+            box-shadow: var(--shadow-md);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+
+        .icon-btn-info {
+            background: #dbeafe;
+        }
+
+        .icon-btn-edit {
+            background: #e0e7ff;
+        }
+
+        .icon-btn-danger {
+            background: #fee2e2;
         }
 
         .tooltip-wrapper {
@@ -242,7 +316,7 @@
             border-radius: 6px;
             padding: 0.5rem;
             position: absolute;
-            z-index: 1;
+            z-index: 10;
             bottom: 125%;
             left: 50%;
             margin-left: -100px;
@@ -257,66 +331,171 @@
             opacity: 1;
         }
 
+        /* ==========================================================================
+           TABLE STYLES (Horizontal Scroll Optimization)
+           ========================================================================== */
+
         .table-container {
             overflow-x: auto;
-            border-radius: 8px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+            -webkit-overflow-scrolling: touch;
             border: 1px solid #e2e8f0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 850px;
+            /* Force overflow on small screens */
             background: white;
         }
 
-        th,
-        td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.95rem;
+        thead {
+            display: table-header-group;
+            background: #f8fafc;
         }
 
         th {
-            background-color: #f8fafc;
+            text-align: left;
+            padding: 1.25rem 1rem;
             font-weight: 600;
-            color: var(--text-main);
+            color: var(--text-light);
+            font-size: 0.75rem;
             text-transform: uppercase;
-            font-size: 0.85rem;
             letter-spacing: 0.05em;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
         }
 
         tr {
-            transition: background-color 0.2s;
+            transition: background-color 0.2s ease;
         }
 
         tr:hover td {
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        td:last-child {
+            text-align: center;
+        }
+
+        /* Responsive adjustments for table min-width */
+        @media (max-width: 640px) {
+            table {
+                min-width: 750px;
+            }
+
+            td,
+            th {
+                padding: 1rem 0.75rem;
+            }
         }
 
         .empty-state {
             text-align: center;
-            padding: 3rem;
+            padding: 4rem 2rem;
             color: var(--text-light);
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
         }
 
-        /* Brand y Footer */
-        .brand-card {
-            padding: 1.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* Utility Classes for JS-Rendered Content */
+        .text-primary {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.05rem;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
+        .text-secondary {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .font-bold {
+            font-weight: 600;
+        }
+
+        .line-height-14 {
+            line-height: 1.4;
+            font-size: 0.85rem;
+        }
+
+        .badge-count {
+            display: inline-block;
+            background: #f1f5f9;
+            color: var(--text-main);
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid #cbd5e1;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-active {
+            background-color: var(--success);
+        }
+
+        .status-stock {
+            background-color: #3b82f6;
+        }
+
+        .status-repair {
+            background-color: #f59e0b;
+        }
+
+        .status-off {
+            background-color: var(--danger);
+        }
+
+        .serial-tag {
+            font-family: monospace;
+            font-size: 0.8rem;
+            background: #f1f5f9;
+            display: inline-block;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            margin-top: 0.25rem;
+            color: var(--text-main);
+        }
+
+        .warranty-over {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--danger);
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 0.4rem;
+        }
+
+        .warranty-info {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 0.4rem;
         }
 
         .brand svg {
@@ -324,59 +503,127 @@
             height: auto;
         }
 
-        .brand-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
+        @media (max-width: 480px) {
+            .brand svg {
+                transform: scale(0.85);
+            }
+        }
+
+        /* Table Controls (Search, Length, Pagination) */
+        .table-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            align-items: center;
+            /* Centrado en móvil */
+        }
+
+        @media (min-width: 640px) {
+            .table-controls {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+            }
+        }
+
+        .table-control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex-grow: 1;
+            max-width: 350px;
+        }
+
+        .search-input-wrapper input {
+            padding-left: 2.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+        }
+
+        .length-select {
+            width: auto;
+            min-width: 120px;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            min-width: 40px;
+            height: 40px;
+            padding: 0 0.5rem;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: var(--text-main);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f8fafc;
+        }
+
+        .pagination-info {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin: 0 1rem;
         }
 
         .app-footer {
             grid-column: 1 / -1;
-            margin-top: 1rem;
-            padding: 1.5rem;
+            margin-top: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
-            color: var(--text-light);
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
         }
 
-        .app-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .app-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .credits-info {
-            line-height: 1.6;
-        }
-
-        .license-info {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 0.5rem;
-        }
-
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
             .app-footer {
                 flex-direction: column;
-                text-align: center;
-            }
-
-            .license-info {
-                align-items: center;
                 text-align: center;
             }
         }
@@ -385,26 +632,13 @@
             body {
                 background: white;
                 padding: 0;
-                margin: 0;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
             }
 
             .container {
                 display: block;
-                max-width: 100%;
             }
 
             .sidebar,
-            .glass-card {
-                box-shadow: none;
-                border: none;
-                padding: 0;
-                background: none;
-            }
-
-            #viewCreateOfficeSidebar,
-            #viewAddEquipmentSidebar,
             .btn,
             .action-col,
             .app-footer {
@@ -414,48 +648,34 @@
             .header-print {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
                 border-bottom: 2px solid #000;
                 padding-bottom: 1rem;
                 margin-bottom: 2rem;
             }
 
-            .header-print h1 {
-                font-size: 1.8rem;
-                margin-bottom: 0.2rem;
-            }
-
-            .office-info-print {
-                display: block !important;
-                margin-bottom: 1.5rem;
-                border: 1px solid #cbd5e1;
-                padding: 1rem;
-            }
-
-            .output-section>h2 {
-                display: none;
-            }
-
-            .table-container {
-                border: none;
-            }
-
             table {
                 border: 1px solid #cbd5e1;
+                width: 100% !important;
+                display: table !important;
             }
 
-            th,
-            td {
-                border: 1px solid #cbd5e1;
-                padding: 0.75rem;
+            thead {
+                display: table-header-group !important;
             }
 
+            tr {
+                display: table-row !important;
+            }
+
+            td,
             th {
-                background-color: #f1f5f9 !important;
+                border: 1px solid #cbd5e1;
+                padding: 0.5rem !important;
+                display: table-cell !important;
             }
 
-            @page {
-                margin: 1.5cm;
+            td::before {
+                display: none !important;
             }
         }
     </style>
@@ -522,6 +742,12 @@
                             <input type="text" id="officeAuditor" required placeholder="Ej: Carlos Noguera">
                         </div>
                         <div class="form-group">
+                            <label>Empresa Auditora *</label>
+                            <input type="text" id="officeAuditorCompany" required placeholder="Ej: TechAudit Solutions">
+                        </div>
+                    </div>
+                    <div class="form-grid-2">
+                        <div class="form-group">
                             <label>Fecha de Auditoría</label>
                             <input type="date" id="officeDate" required>
                         </div>
@@ -561,7 +787,7 @@
                     <!-- Detalles dinámicos -->
                 </div>
 
-                <h2 style="font-size: 1.1rem; margin-bottom: 1.5rem;">💻 Nuevo Equipo</h2>
+                <h2 id="equipmentFormTitle" style="font-size: 1.1rem; margin-bottom: 1.5rem;">💻 Nuevo Equipo</h2>
                 <form id="inventoryForm">
                     <div class="form-group">
                         <label>Categoría</label>
@@ -629,32 +855,13 @@
 
                     <!-- Botones de Acción sobre INVENTARIO -->
                     <div class="button-group">
-                        <button type="submit" class="btn btn-submit" id="submitBtn">
-                            ➕ Añadir Equipo
-                        </button>
+
                         <button type="button" class="btn btn-clear" id="cancelEditBtn"
                             style="display: none; margin-top: 0; background-color: #fca5a5; color: white; border:none;"
                             onclick="cancelEdit()">
                             ❌ Cancelar Edición
                         </button>
 
-                        <button type="button" class="btn btn-excel" onclick="exportToCSV()">
-                            📊 Exportar Excel de Oficina
-                        </button>
-
-                        <div class="tooltip-wrapper" id="pdfTooltipWrapper">
-                            <button type="button" class="btn btn-pdf" id="pdfBtn" onclick="exportToPDF()">
-                                📄 Generar PDF Oficina
-                            </button>
-                            <span class="tooltip-text" id="pdfTooltipText" style="display:none;">⚠️ Sin conexión a
-                                Internet.
-                                Descargar PDF requiere conexión para cargar la librería jsPDF. Usa 'Imprimir Ventana'
-                                como alternativa.</span>
-                        </div>
-
-                        <button type="button" class="btn btn-print" onclick="window.print()">
-                            🖨️ Imprimir Ventana
-                        </button>
                     </div>
                 </form>
             </div>
@@ -672,6 +879,22 @@
                     0 oficinas
                 </span>
             </h2>
+            <div class="table-controls">
+                <div class="table-control-group">
+                    <label>Ver</label>
+                    <select id="officeLength" class="length-select" onchange="changeLength('offices', this.value)">
+                        <option value="10">10 registros</option>
+                        <option value="25">25 registros</option>
+                        <option value="50">50 registros</option>
+                        <option value="all">Todo</option>
+                    </select>
+                </div>
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="officeSearch" placeholder="Buscar oficina..."
+                        oninput="handleSearch('offices', this.value)">
+                </div>
+            </div>
             <div class="table-container">
                 <table id="officesTable">
                     <thead>
@@ -687,6 +910,7 @@
                     </tbody>
                 </table>
             </div>
+            <div id="officePagination" class="pagination-container"></div>
         </div>
 
 
@@ -723,13 +947,35 @@
             </div>
 
             <h2
-                style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                <span>📦 Inventario de Equipos</span>
-                <span id="itemCount"
-                    style="font-size: 0.9rem; background: #e0e7ff; color: #4338ca; padding: 0.25rem 0.75rem; border-radius: 9999px;">0
-                    items</span>
+                style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>📦 Inventario de Equipos</span>
+                    <span id="itemCount" class="badge-count">0 items</span>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="submitIconButton" class="icon-btn icon-btn-edit" title="Añadir Equipo"
+                        onclick="document.getElementById('inventoryForm').requestSubmit()">➕</button>
+                    <button class="icon-btn icon-btn-info" title="Exportar CSV" onclick="exportToCSV()">📊</button>
+                    <button class="icon-btn icon-btn-info" title="Generar PDF" onclick="exportToPDF()">📄</button>
+                </div>
             </h2>
 
+            <div class="table-controls">
+                <div class="table-control-group">
+                    <label>Ver</label>
+                    <select id="equipmentLength" class="length-select" onchange="changeLength('equipment', this.value)">
+                        <option value="10">10 registros</option>
+                        <option value="25">25 registros</option>
+                        <option value="50">50 registros</option>
+                        <option value="all">Todo</option>
+                    </select>
+                </div>
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="equipmentSearch" placeholder="Buscar equipo..."
+                        oninput="handleSearch('equipment', this.value)">
+                </div>
+            </div>
             <div class="table-container">
                 <table id="inventoryTable">
                     <thead>
@@ -746,6 +992,7 @@
                     </tbody>
                 </table>
             </div>
+            <div id="equipmentPagination" class="pagination-container"></div>
         </div>
 
         <!-- Footer con Créditos y Licencia -->
@@ -755,10 +1002,6 @@
                 Contacto: <a href="mailto:cnoguera.dev@gmail.com">cnoguera.dev@gmail.com</a>
             </div>
             <div class="license-info">
-                <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">
-                    <img alt="Licencia Creative Commons" style="border-width:0; margin-bottom: 0.25rem;"
-                        src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" />
-                </a>
                 <span>Esta obra y código fuente están bajo una <br> <a rel="license"
                         href="http://creativecommons.org/licenses/by-nc/4.0/" target="_blank">Licencia Creative Commons
                         Atribución-NoComercial 4.0</a>.</span>
@@ -781,6 +1024,20 @@
         let editingIndex = -1;     // índice de edición del inventario en uso
         let editingOfficeId = null; // null si estamos creando una oficina nueva
 
+        // Estado de Tablas (Paginación y Búsqueda)
+        const tableState = {
+            offices: {
+                currentPage: 1,
+                itemsPerPage: 10,
+                searchQuery: ""
+            },
+            equipment: {
+                currentPage: 1,
+                itemsPerPage: 10,
+                searchQuery: ""
+            }
+        };
+
         // DOM Referencias - Vistas
         const viewCreateOfficeSidebar = document.getElementById('viewCreateOfficeSidebar');
         const viewAddEquipmentSidebar = document.getElementById('viewAddEquipmentSidebar');
@@ -800,7 +1057,7 @@
         const dynamicContainer = document.getElementById('dynamicFieldsContainer');
         const submitBtnOffice = document.getElementById('submitBtnOffice');
         const cancelEditOfficeBtn = document.getElementById('cancelEditOfficeBtn');
-        const submitBtnEquipment = document.getElementById('submitBtn');
+        const submitBtnEquipment = document.getElementById('submitIconButton');
         const cancelEditEquipmentBtn = document.getElementById('cancelEditBtn');
 
         // Función central para guardar en memoria
@@ -808,47 +1065,116 @@
             localStorage.setItem('pocketInventoryAppV2', JSON.stringify(appData));
         }
 
+        // =============== LOGICA DE TABLAS (BUSQUEDA Y PAGINACION) ===============
+
+        function handleSearch(tableType, query) {
+            tableState[tableType].searchQuery = query.toLowerCase();
+            tableState[tableType].currentPage = 1; // Reset a pág 1 al buscar
+            if (tableType === 'offices') renderOfficesTable();
+            else renderTable();
+        }
+
+        function changeLength(tableType, length) {
+            tableState[tableType].itemsPerPage = length === 'all' ? Infinity : parseInt(length);
+            tableState[tableType].currentPage = 1;
+            if (tableType === 'offices') renderOfficesTable();
+            else renderTable();
+        }
+
+        function updatePagination(tableType, totalItems, containerId) {
+            const container = document.getElementById(containerId);
+            const state = tableState[tableType];
+            container.innerHTML = '';
+
+            if (state.itemsPerPage === Infinity || totalItems <= state.itemsPerPage) return;
+
+            const totalPages = Math.ceil(totalItems / state.itemsPerPage);
+
+            // Botón Anterior
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'pagination-btn';
+            prevBtn.innerHTML = '‹';
+            prevBtn.disabled = state.currentPage === 1;
+            prevBtn.onclick = () => {
+                state.currentPage--;
+                if (tableType === 'offices') renderOfficesTable();
+                else renderTable();
+            };
+            container.appendChild(prevBtn);
+
+            // Resumen de página
+            const info = document.createElement('span');
+            info.className = 'pagination-info';
+            info.textContent = `Página ${state.currentPage} de ${totalPages}`;
+            container.appendChild(info);
+
+            // Botón Siguiente
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'pagination-btn';
+            nextBtn.innerHTML = '›';
+            nextBtn.disabled = state.currentPage === totalPages;
+            nextBtn.onclick = () => {
+                state.currentPage++;
+                if (tableType === 'offices') renderOfficesTable();
+                else renderTable();
+            };
+            container.appendChild(nextBtn);
+        }
+
         // =============== GESTOR DE OFICINAS ===============
 
-        // 1. Renderizar tabla de Oficinas
         function renderOfficesTable() {
             officesTableBody.innerHTML = '';
+            const state = tableState.offices;
 
-            if (appData.length === 0) {
+            // Filtrado
+            let filtered = appData.filter(office =>
+                office.company.toLowerCase().includes(state.searchQuery) ||
+                office.depto.toLowerCase().includes(state.searchQuery) ||
+                office.location.toLowerCase().includes(state.searchQuery) ||
+                office.auditor.toLowerCase().includes(state.searchQuery)
+            );
+
+            if (filtered.length === 0) {
                 officesTableBody.innerHTML = `
                     <tr>
                         <td colspan="5" class="empty-state">
                             <div style="font-size: 2rem; margin-bottom: 1rem;">🏢</div>
-                            No hay oficinas o clientes registrados.<br>Añade una empresa usando el formulario principal.
+                            ${state.searchQuery ? 'No se encontraron resultados para tu búsqueda.' : 'No hay oficinas o clientes registrados.<br>Añade una empresa usando el formulario principal.'}
                         </td>
                     </tr>
                 `;
+                document.getElementById('officePagination').innerHTML = '';
             } else {
-                // Iterar desde atrás para mostrar las últimas primero (opcional) o en orden natural
-                appData.forEach((office) => {
+                // Paginación
+                const start = (state.currentPage - 1) * state.itemsPerPage;
+                const pagedItems = state.itemsPerPage === Infinity ? filtered : filtered.slice(start, start + state.itemsPerPage);
+
+                pagedItems.forEach((office) => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>
-                            <strong style="color:var(--primary); font-size: 1.05rem;">${office.company}</strong><br>
-                            <span style="font-size:0.85rem;color:#64748b;">Depto: ${office.depto}</span>
+                        <td data-label="Empresa / Cliente">
+                            <strong class="text-primary">${office.company}</strong><br>
+                            <span class="text-secondary">Depto: ${office.depto}</span>
                         </td>
-                        <td>${office.location}</td>
-                        <td>${office.auditor}</td>
-                        <td style="text-align: center;">
-                            <span style="font-size: 0.9rem; background: #f1f5f9; padding: 0.25rem 0.6rem; border-radius: 12px; font-weight: 600; border: 1px solid #cbd5e1;">        
-                                ${office.inventory.length}
-                            </span>
+                        <td data-label="Ubicación">${office.location}</td>
+                        <td data-label="Auditor">${office.auditor}</td>
+                        <td data-label="Equipos" class="text-center">
+                            <span class="badge-count">${office.inventory.length}</span>
                         </td>
-                        <td class="action-col" style="text-align: center; display: flex; flex-direction: column; gap: 0.5rem; justify-content: center;">
-                            <button class="btn-delete" style="background:#10b981; color:white; border:none;" onclick="selectOffice('${office.id}')">Seleccionar ➡️</button>
-                            <button class="btn-delete" style="background:#e0e7ff; color:var(--primary); align-self: stretch;" title="Editar Info de Oficina" onclick="editOffice('${office.id}')">Editar Oficina</button>
-                            <button class="btn-delete" style="background:#fee2e2; color:var(--danger);" onclick="deleteOffice('${office.id}')">Borrar Todo</button>
+                        <td data-label="Acciones" class="action-col">
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-info" title="Seleccionar Oficina" onclick="selectOffice('${office.id}')">📂</button>
+                                <button class="icon-btn icon-btn-edit" title="Editar Oficina" onclick="editOffice('${office.id}')">✏️</button>
+                                <button class="icon-btn icon-btn-danger" title="Borrar Todo" onclick="deleteOffice('${office.id}')">🗑️</button>
+                            </div>
                         </td>
                     `;
                     officesTableBody.appendChild(tr);
                 });
+                updatePagination('offices', filtered.length, 'officePagination');
             }
-            document.getElementById('officeCountBadge').textContent = `${appData.length} oficina${appData.length !== 1 ? 's' : ''}`;
+            document.getElementById('officeCountBadge').textContent = `${filtered.length} oficina${filtered.length !== 1 ? 's' : ''}`;
         }
 
         // 2. Registrar o Actualizar oficina
@@ -863,6 +1189,7 @@
                     officeToUpdate.depto = document.getElementById('officeDepto').value.trim();
                     officeToUpdate.location = document.getElementById('officeLocation').value.trim();
                     officeToUpdate.auditor = document.getElementById('officeAuditor').value.trim();
+                    officeToUpdate.auditorCompany = document.getElementById('officeAuditorCompany').value.trim();
                     officeToUpdate.auditDate = document.getElementById('officeDate').value;
                     officeToUpdate.manager = document.getElementById('officeManager').value.trim();
                     officeToUpdate.managerTitle = document.getElementById('officeManagerTitle').value.trim();
@@ -878,6 +1205,7 @@
                     depto: document.getElementById('officeDepto').value.trim(),
                     location: document.getElementById('officeLocation').value.trim(),
                     auditor: document.getElementById('officeAuditor').value.trim(),
+                    auditorCompany: document.getElementById('officeAuditorCompany').value.trim(),
                     auditDate: document.getElementById('officeDate').value,
                     manager: document.getElementById('officeManager').value.trim(),
                     managerTitle: document.getElementById('officeManagerTitle').value.trim(),
@@ -903,6 +1231,7 @@
             document.getElementById('officeDepto').value = office.depto;
             document.getElementById('officeLocation').value = office.location;
             document.getElementById('officeAuditor').value = office.auditor;
+            document.getElementById('officeAuditorCompany').value = office.auditorCompany || '';
             document.getElementById('officeDate').value = office.auditDate || '';
             document.getElementById('officeManager').value = office.manager || '';
             document.getElementById('officeManagerTitle').value = office.managerTitle || '';
@@ -1043,60 +1372,79 @@
             return appData.find(o => o.id === activeOfficeId);
         }
 
-        // Renderizar tabla a partir del Array de datos de su oficina
         function renderTable() {
             tbody.innerHTML = '';
             const office = getActiveOffice();
             if (!office) return;
-            const inventoryData = office.inventory; // array of items
+            const state = tableState.equipment;
 
-            if (inventoryData.length === 0) {
+            // Filtrado Multi-campo
+            let filtered = office.inventory.map((item, originalIndex) => ({ ...item, originalIndex }))
+                .filter(item => {
+                    const q = state.searchQuery;
+                    return item.assetTag.toLowerCase().includes(q) ||
+                        item.type.toLowerCase().includes(q) ||
+                        item.model.toLowerCase().includes(q) ||
+                        item.serial.toLowerCase().includes(q) ||
+                        item.user.toLowerCase().includes(q) ||
+                        item.notes.toLowerCase().includes(q);
+                });
+
+            if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr id="emptyRow">
                         <td colspan="6" class="empty-state">
                             <div style="font-size: 2rem; margin-bottom: 1rem;">📭</div>
-                            No hay equipos registrados en esta oficina.<br>Comienza añadiendo uno desde el panel lateral.
+                            ${state.searchQuery ? 'No se encontraron equipos para tu búsqueda.' : 'No hay equipos registrados en esta oficina.<br>Comienza añadiendo uno desde el panel lateral.'}
                         </td>
                     </tr>
                 `;
+                document.getElementById('equipmentPagination').innerHTML = '';
             } else {
-                inventoryData.forEach((item, index) => {
+                // Paginación
+                const start = (state.currentPage - 1) * state.itemsPerPage;
+                const pagedItems = state.itemsPerPage === Infinity ? filtered : filtered.slice(start, start + state.itemsPerPage);
+
+                pagedItems.forEach((item) => {
                     const tr = document.createElement('tr');
 
                     // Lógica de estilos por estado
-                    const statusBadge = item.status === 'Activo' ? '<span style="background:#10b981;color:#fff;padding:0.2rem 0.5rem;border-radius:1rem;font-size:0.8rem;">Activo</span>' :
-                        item.status === 'Stock' ? '<span style="background:#3b82f6;color:#fff;padding:0.2rem 0.5rem;border-radius:1rem;font-size:0.8rem;">Stock</span>' :
-                            item.status === 'Reparación' ? '<span style="background:#f59e0b;color:#fff;padding:0.2rem 0.5rem;border-radius:1rem;font-size:0.8rem;">Reparo</span>' :
-                                '<span style="background:#ef4444;color:#fff;padding:0.2rem 0.5rem;border-radius:1rem;font-size:0.8rem;">Baja</span>';
+                    const statusBadge = item.status === 'Activo' ? '<span class="status-badge status-active">Activo</span>' :
+                        item.status === 'Stock' ? '<span class="status-badge status-stock">Stock</span>' :
+                            item.status === 'Reparación' ? '<span class="status-badge status-repair">Reparo</span>' :
+                                '<span class="status-badge status-off">Baja</span>';
 
                     tr.innerHTML = `
-                        <td><strong>${item.assetTag}</strong></td>
-                        <td>
-                            <div style="font-weight:600;">${item.type}</div>
-                            <div style="color:#64748b;font-size:0.85rem;">${item.model}</div>
-                            <div style="font-family:monospace;font-size:0.8rem;background:#f1f5f9;display:inline-block;padding:0.1rem 0.3rem;border-radius:4px;margin-top:0.2rem;">S/N: ${item.serial}</div>
+                        <td data-label="ID Activo"><strong>${item.assetTag}</strong></td>
+                        <td data-label="Info General">
+                            <div class="font-bold">${item.type}</div>
+                            <div class="text-secondary">${item.model}</div>
+                            <div class="serial-tag">S/N: ${item.serial}</div>
                         </td>
-                        <td>
+                        <td data-label="Estado & Asignación">
                             <div style="margin-bottom:0.3rem;">${statusBadge}</div>
                             <div>${item.user}</div>
                         </td>
-                        <td>
-                            <div style="font-size:0.85rem;line-height:1.4;">${item.notes.replace(/ \| /g, '<br>')}</div>
-                            ${item.hasWarranty === 'No' ? `<div style="margin-top:0.5rem;font-size:0.8rem;color:#ef4444;border-top:1px dashed #cbd5e1;padding-top:0.3rem;"><strong>Garantía:</strong> Vencida / Sin Cobertura</div>` :
-                            (item.purchaseDate || item.warrantyDate) ? `<div style="margin-top:0.5rem;font-size:0.8rem;color:#64748b;border-top:1px dashed #cbd5e1;padding-top:0.3rem;">
+                        <td data-label="Especificaciones">
+                            <div class="line-height-14">${item.notes.replace(/ \| /g, '<br>')}</div>
+                            ${item.hasWarranty === 'No' ? `<div class="warranty-over"><strong>Garantía:</strong> Vencida / Sin Cobertura</div>` :
+                            (item.purchaseDate || item.warrantyDate) ? `<div class="warranty-info">
                                 ${item.purchaseDate ? `<strong>Compra:</strong> ${item.purchaseDate}` : ''} 
                                 ${item.warrantyDate ? ` <strong>Garantía:</strong> ${item.warrantyDate}` : ''}
                             </div>` : ''}
                         </td>
-                        <td class="action-col" style="text-align: center; display: flex; flex-direction: column; gap: 0.5rem; justify-content: center; height: 100%;">
-                            <button class="btn-delete" style="background:#e0e7ff; color:var(--primary);" title="Editar equipo" onclick="editItem(${index})">Editar</button>
-                            <button class="btn-delete" title="Eliminar equipo" onclick="deleteItem(${index})">Eliminar</button>
+                        <td data-label="Acciones" class="action-col">
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-edit" title="Editar equipo" onclick="editItem(${item.originalIndex})">✏️</button>
+                                <button class="icon-btn icon-btn-danger" title="Eliminar equipo" onclick="deleteItem(${item.originalIndex})">🗑️</button>
+                            </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
+                updatePagination('equipment', filtered.length, 'equipmentPagination');
             }
-            countBadge.textContent = `${inventoryData.length} item${inventoryData.length !== 1 ? 's' : ''}`;
+            countBadge.textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''}`;
         }
 
         // Función para mostrar/ocultar fechas
@@ -1208,7 +1556,9 @@
                 }
             }, 10);
 
-            submitBtn.innerHTML = '💾 Guardar Equipo';
+            submitBtnEquipment.innerHTML = '💾';
+            submitBtnEquipment.title = 'Guardar Cambios';
+            document.getElementById('equipmentFormTitle').innerHTML = '📋 Editar Equipo';
             cancelEditBtn.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1220,7 +1570,16 @@
             document.getElementById('hasWarranty').value = 'Sí';
             toggleDates();
             dynamicContainer.innerHTML = '';
-            submitBtn.innerHTML = '➕ Añadir Equipo';
+
+            // Si el elemento existe (para evitar errores si no se ha cargado)
+            const iconBtn = document.getElementById('submitIconButton');
+            if (iconBtn) {
+                iconBtn.innerHTML = '➕';
+                iconBtn.title = 'Añadir Equipo';
+            }
+            const title = document.getElementById('equipmentFormTitle');
+            if (title) title.innerHTML = '💻 Nuevo Equipo';
+
             cancelEditBtn.style.display = 'none';
         }
 
@@ -1300,92 +1659,131 @@
             // Configurar documento en formato A4 horizontal ('l')
             const doc = new jsPDF('l', 'mm', 'a4');
 
+            // Configurar metadatos del documento
+            doc.setProperties({
+                title: `Reporte de Inventario IT - ${office.company}`,
+                subject: 'Auditoría de Equipos IT',
+                author: 'PocketInventory',
+                keywords: 'inventario, it, auditoría',
+                creator: 'PocketInventory App'
+            });
+
             // Título PDF
             doc.setFont("helvetica", "bold");
             doc.setFontSize(22);
             doc.setTextColor(79, 70, 229); // --primary
-            doc.text("PocketInventory", 14, 22);
+            doc.text("PocketInventory", 14, 20);
 
             doc.setFontSize(14);
             doc.setTextColor(15, 23, 42); // --text-main
-            doc.text("Reporte de Equipos IT", 14, 30);
+            doc.text("Reporte de Equipos IT", 14, 28);
 
             // Fecha PDF
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139); // --text-light
-            doc.text(`Fecha de Auditoría: ${office.auditDate || currentDateStr}`, 14, 38);
+            doc.text(`Fecha de Auditoría: ${office.auditDate || currentDateStr}`, 14, 34);
+
+            // Resumen de Inventario (Mini Dashboard)
+            const stats = inventoryData.reduce((acc, item) => {
+                const s = item.status;
+                if (s === 'Activo') acc.Activo++;
+                else if (s === 'Stock') acc.Stock++;
+                else if (s === 'Reparación') acc.Reparación++;
+                else acc.Baja++;
+                acc.total++;
+                return acc;
+            }, { Activo: 0, Stock: 0, Reparación: 0, Baja: 0, total: 0 });
+
+            doc.setDrawColor(226, 232, 240);
+            doc.setFillColor(248, 250, 252);
+            doc.roundedRect(170, 15, 110, 25, 3, 3, 'FD');
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(79, 70, 229);
+            doc.text("Resumen de Inventario", 175, 21);
+
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(15, 23, 42);
+            doc.text(`Total: ${stats.total} | Activos: ${stats.Activo} | Stock: ${stats.Stock}`, 175, 27);
+            doc.text(`Reparación: ${stats.Reparación} | Baja: ${stats.Baja}`, 175, 32);
 
             // Funciones de ayuda para concatenar Negrita + Normal en JS PDF
             function drawLabelValue(label, value, x, y) {
                 doc.setFont("helvetica", "bold");
                 doc.text(label, x, y);
                 doc.setFont("helvetica", "normal");
-                const labelWidth = doc.getTextWidth(label + " ");
-                doc.text(value, x + labelWidth, y);
+                const labelWidth = doc.getTextWidth(label);
+                doc.text(String(value), x + labelWidth + 3, y);
             }
 
             // Información de Oficina PDF
             doc.setFontSize(10);
             doc.setTextColor(15, 23, 42);
 
-            drawLabelValue("Empresa/Cliente:", office.company, 14, 48);
-            drawLabelValue("Depto:", office.depto, 100, 48);
-            drawLabelValue("Ubicación:", office.location, 14, 54);
+            drawLabelValue("Empresa/Cliente:", office.company, 14, 44);
+            drawLabelValue("Depto:", office.depto, 100, 44);
+            drawLabelValue("Ubicación:", office.location, 14, 50);
 
-            // Textos en negrita para nombres clave del reporte en la cabecera
-            drawLabelValue("Auditor Inst.:", office.auditor, 100, 54);
-
-            // Caso especial para Gerente porque incluye el cargo
+            // Auditor
             doc.setFont("helvetica", "bold");
-            doc.text("Resp. Aprobador:", 180, 54);
-            const respLabelWidth = doc.getTextWidth("Resp. Aprobador: ");
-            doc.text(`${office.manager}`, 180 + respLabelWidth, 54);
+            doc.text("Auditor Inst.:", 100, 50);
             doc.setFont("helvetica", "normal");
-            const managerNameWidth = doc.getTextWidth(`${office.manager} `);
-            doc.text(`(${office.managerTitle})`, 180 + respLabelWidth + managerNameWidth, 54);
+            doc.text(`${office.auditor}`, 100 + doc.getTextWidth("Auditor Inst.: ") + 1, 50);
+            doc.setFontSize(10);
+            doc.setTextColor(15, 23, 42);
+
+            // Responsable
+            doc.setFont("helvetica", "bold");
+            doc.text("Resp. Aprobador:", 180, 50);
+            const respLabelWidth = doc.getTextWidth("Resp. Aprobador: ");
+            doc.text(`${office.manager} (${office.managerTitle})`, 180 + respLabelWidth, 50);
 
             doc.setDrawColor(203, 213, 225);
-            doc.line(14, 58, 280, 58);
+            doc.line(14, 54, 280, 54);
 
             // Preparar datos para AutoTable
             const tableColumn = ["ID Activo", "Estado", "Categoría / Modelo", "S/N / Asignación", "Especificaciones"];
-            const tableRows = [];
-
-            inventoryData.forEach(item => {
-                const datesInfo = item.hasWarranty === 'No' ? '\n[Garantía: Vencida / Sin Cobertura]' :
+            const tableRows = inventoryData.map(item => {
+                const datesInfo = item.hasWarranty === 'No' ? '\n[Garantía: Vencida]' :
                     (item.purchaseDate || item.warrantyDate ? `\n[Compra: ${item.purchaseDate || 'N/A'} - Garantía: ${item.warrantyDate || 'N/A'}]` : '');
 
-                tableRows.push([
+                return [
                     item.assetTag,
                     item.status,
                     `${item.type}\n${item.model}`,
                     `S/N: ${item.serial}\nUsu: ${item.user}`,
                     item.notes + datesInfo
-                ]);
+                ];
             });
 
             // Generar tabla
             doc.autoTable({
                 head: [tableColumn],
                 body: tableRows,
-                startY: 63,
+                startY: 59,
                 theme: 'grid',
-                styles: { font: "helvetica", fontSize: 10 },
-                headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255] }, // --primary
+                styles: { font: "helvetica", fontSize: 9, cellPadding: 3 },
+                headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
                 alternateRowStyles: { fillColor: [248, 250, 252] },
                 margin: { bottom: 20 },
                 didDrawPage: function (data) {
-                    // Footer en cada página
-                    let str = "Reporte generado mediante PocketInventory | Desarrollado por Carlos Noguera | cnoguera.dev@gmail.com";
+                    // Footer: Info + Paginación
+                    const pageHeight = doc.internal.pageSize.getHeight();
+                    const pageWidth = doc.internal.pageSize.getWidth();
+
                     doc.setFontSize(8);
                     doc.setFont("helvetica", "italic");
-                    doc.setTextColor(148, 163, 184); // slate-400
+                    doc.setTextColor(148, 163, 184);
 
-                    // jsPDF 1.4+ uses internal.pageSize.height or internal.pageSize.getHeight()
-                    let pageHeight = doc.internal.pageSize.getHeight ? doc.internal.pageSize.getHeight() : doc.internal.pageSize.height;
+                    const footerText = "Reporte generado por PocketInventory | cnoguera.dev@gmail.com";
+                    doc.text(footerText, 14, pageHeight - 10);
 
-                    doc.text(str, data.settings.margin.left, pageHeight - 10);
+                    // Número de página
+                    const pageStr = `Página ${doc.internal.getNumberOfPages()}`;
+                    doc.text(pageStr, pageWidth - 30, pageHeight - 10);
                 }
             });
 
@@ -1408,6 +1806,10 @@
             doc.text("FIRMA DEL AUDITOR TÉCNICO", 60, sigY + 6, null, null, "center");
             doc.setFont("helvetica", "bold");
             doc.text(`${String(office.auditor).toUpperCase()}`, 60, sigY + 12, null, null, "center");
+            doc.setFont("helvetica", "italic");
+            doc.setFontSize(9);
+            doc.text(`${String(office.auditorCompany).toUpperCase()}`, 60, sigY + 17, null, null, "center");
+            doc.setFontSize(10); // Reset for next elements
 
             // Central Stamp Area
             doc.setFont("helvetica", "bold");
