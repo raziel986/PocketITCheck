@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketit-check-v2';
+const CACHE_NAME = 'pocketit-check-v3';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -15,6 +15,7 @@ const ASSETS_TO_CACHE = [
 
 // Install Event
 self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Force the waiting service worker to become the active service worker
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             console.log('Caching assets...');
@@ -30,6 +31,8 @@ self.addEventListener('activate', (event) => {
             return Promise.all(
                 keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
             );
+        }).then(() => {
+            return self.clients.claim(); // Become available to all pages immediately
         })
     );
 });

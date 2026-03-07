@@ -939,8 +939,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        setTimeout(() => {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed', err));
-        }, 1000);
+        navigator.serviceWorker.register('sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // Notify user or auto-reload
+                        console.log('New content is available; please refresh.');
+                        // Automatic reload to ensure the latest version is used
+                        window.location.reload();
+                    }
+                });
+            });
+        }).catch(err => console.log('SW failed', err));
+    });
+
+    // Handle controller change (e.g. when skipWaiting() was called)
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
     });
 }
