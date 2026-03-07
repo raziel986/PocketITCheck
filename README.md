@@ -1,40 +1,47 @@
-# PocketInventory - SPA
+# PocketInventory IT - SPA & PWA
 
-PocketInventory es una Aplicación de Página Única (SPA) contenida íntegramente en un solo archivo `index.html`. Está diseñada para ser una herramienta rápida, extremadamente portátil y que funciona sin necesidad de un servidor *backend*. Permite a auditores, técnicos de soporte y administradores de TI llevar un registro organizado, multi-oficina y offline de los activos informáticos.
+PocketInventory es una Aplicación Web Progresiva (PWA) de Página Única (SPA) contenida íntegramente en un solo archivo `index.html`. Está diseñada para ser una herramienta rápida, extremadamente portátil y que funciona sin necesidad de un servidor *backend*. Permite a auditores, técnicos de soporte y administradores de TI llevar un registro organizado, multi-oficina y offline de los activos informáticos con una experiencia tipo aplicación nativa en dispositivos móviles.
 
 ## ✨ Características Principales
 
-- **Diseño Todo-en-Uno (Zero-Install):** Todo el código (HTML, CSS, JS) vive en un solo archivo. Simplemente haz doble clic y comienza a trabajar en cualquier navegador.
-- **Gestión Multi-Oficina / Multi-Cliente:** Crea espacios de trabajo aislados para cada cliente o departamento y maneja los inventarios por separado.
-- **Estándares ITIL / ISO 20000:** Cumple con convenciones internacionales incorporando campos estandarizados (Número de Serie, Asset Tag, estado del equipo, fechas de compra/garantía).
-- **Atributos Dinámicos por Categoría:** El formulario de creación se adapta en tiempo real mostrando campos técnicos específicos dependiendo de si cargas una Laptop, Desktop, Impresora, Router, etc.
-- **Funcionamiento *Offline-First*:** Los datos se guardan automáticamente en tu computadora usando `localStorage`.
-- **Exportación Versátil:** Descarga localmente:
-  - Reporte consolidado en Excel (formato CSV nativo).
-  - Reporte profesional en formato PDF.
-  - Formato amigable para imprimir el listado o guardarlo como comprobante.
-- **Detección Automática de Conexión:** Si te quedaste sin Internet evaluando equipos en un sótano, la app deshabilita dinámicamente la función PDF (que requiere descargar `jsPDF` externamente) e inteligentemente recomienda alternativas 100% offline.
+- **Diseño Todo-en-Uno (Zero-Install):** Todo el código vive en un solo archivo. Simplemente ábrelo y comienza a trabajar.
+- **PWA Ready (Mobile First):** Instalable en Android e iOS como una aplicación nativa. Incluye soporte para **Modo Offline** gracias a su Service Worker.
+- **Gestión Avanzada de Tablas (DataTables-Like):** 
+  - Búsqueda en tiempo real multi-campo.
+  - Paginación inteligente y ajustable (10, 25, 50, Todos).
+  - Interfaz optimizada para pantallas táctiles (48px target).
+- **Reportes PDF Profesionales:** 
+  - **Dashboard de Resumen:** Visualización instantánea de totales por estado (Activo, Stock, Reparación, Baja).
+  - **Identificación Formal:** Incluye datos del Auditor Técnico, Empresa Auditora y Responsable de Oficina.
+  - **Paginación en Reportes:** Numeración "Página X de Y" automática.
+  - **Propiedades Documentales:** Metadatos internos (Título, Autor) configurados.
+- **Atributos Dinámicos por Categoría:** Formulario inteligente que muestra campos específicos según el tipo de equipo (Laptop, Desktop, etc.).
+- **Privacidad Total:** Los datos se guardan localmente en el navegador (`localStorage`), garantizando que la información nunca salga de tu dispositivo.
 
 ---
 
-## 🚀 Cómo usar
+## 🚀 Cómo usar e Instalar
 
-1. Descarga el archivo `PocketInventory.html`.
-2. Ábrelo en cualquier navegador web moderno (Google Chrome, Firefox, Microsoft Edge, Safari).
-3. Aparecerá el Gestor de Oficinas: registra una oficina nueva y luego pulsa el botón **"Seleccionar ➡️"**.
-4. ¡Comienza a llenar el inventario! Toda la información introducida persistirá localmente, es decir, el navegador la recordará incluso si cierras la pestaña.
+### Uso Rápido
+1. Abre `index.html` en cualquier navegador moderno.
+2. Comienza a registrar oficinas y equipos.
 
-> **Importante:** Al vivir enteramente bajo la tecnología `localStorage`, la información se guarda únicamente en tu navegador. Si limpias rutinariamente la caché de tu navegador o utilizas el "Modo Incógnito", perderás los datos de las oficinas creadas. ¡Recuerda utilizar constantemente los botones de exportación!
+### Instalación como App (PWA) - Opción Recomendada
+Para disfrutar de la experiencia completa sin barras de navegación y con soporte offline:
+1. **Sube los archivos** (`index.html`, `manifest.json`, `sw.js`, `icon-512.png`) a un servicio de hosting con HTTPS (como **GitHub Pages**).
+2. Abre la URL en tu móvil.
+3. **Android**: Pulsa "Instalar" en el aviso inferior o en el menú de Chrome.
+4. **iOS (iPhone)**: Pulsa el botón "Compartir" en Safari y selecciona **"Agregar a la pantalla de inicio"**.
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **Front-end:** HTML5, CSS3, Vanilla JavaScript (ES6+).
-- **Estilos:** Flexbox y CSS Grid. UI reactiva y *Dark Mode* adaptativo embebido mediante CSS plano (*Glassmorphism*).
-- **Librerías (*vía CDN*):**
-  - [jsPDF](https://github.com/parallax/jsPDF) - Para la generación de archivos PDF del lado del cliente.
-  - [jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable) - Módulo complementario para construir y renderizar el formato de la lista de auditoría interna de PDFs.
+- **Núcleo:** HTML5, CSS3 (*Glassmorphism*), Vanilla JavaScript (ES6+).
+- **PWA:** Web App Manifest y Service Workers para almacenamiento en caché y offline.
+- **Librerías (CDN):**
+  - [jsPDF](https://github.com/parallax/jsPDF) & [jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable): Generación de reportes de auditoría.
+  - **Google Fonts:** Tipografía *Outfit* para una estética moderna y premium.
 
 ---
 
@@ -42,12 +49,9 @@ PocketInventory es una Aplicación de Página Única (SPA) contenida íntegramen
 
 PocketInventory está protegido bajo la **Licencia Creative Commons Atribución-NoComercial 4.0 Internacional (CC BY-NC 4.0)**. 
 
-Esto significa que eres totalmente libre de descargar, usar y modificar esta herramienta para tus auditorías o las de tu departamento de forma gratuita, siempre y cuando se cumplan dos reglas principales:
-
-1. **Reconocimiento (Atribución):** Debes dar crédito explícito al autor original (Carlos Noguera) manteniendo el pie de página de la aplicación y la mención en el código.
-2. **Uso No Comercial:** Queda estrictamente prohibido empaquetar, vender o usar este software con el propósito directo de comercializarlo como producto propio.
-
-Para leer los detalles legales completos, consulta el archivo [LICENSE](LICENSE) incluido en este repositorio o visita [Creative Commons](https://creativecommons.org/licenses/by-nc/4.0/deed.es).
+Esto significa que eres libre de usar y modificar esta herramienta, siempre y cuando:
+1. **Atribución:** Mantengas el crédito al autor original (**Carlos Noguera**).
+2. **Uso No Comercial:** No se permite la venta o comercialización directa de este software.
 
 ---
 
