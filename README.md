@@ -1,6 +1,8 @@
-# PocketInventory IT - SPA & PWA
+# PocketITCheck - SPA & PWA
 
-PocketInventory es una Aplicación Web Progresiva (PWA) de Página Única (SPA) contenida íntegramente en un solo archivo `index.html`. Está diseñada para ser una herramienta rápida, extremadamente portátil y que funciona sin necesidad de un servidor *backend*. Permite a auditores, técnicos de soporte y administradores de TI llevar un registro organizado, multi-oficina y offline de los activos informáticos con una experiencia tipo aplicación nativa en dispositivos móviles.
+**Inventory | Diagnostics | Maintenance | Repairs**
+
+PocketITCheck es una Aplicación Web Progresiva (PWA) de Página Única (SPA) contenida íntegramente en un solo archivo `index.html`. Está diseñada para ser una herramienta rápida, extremadamente portátil y que funciona sin necesidad de un servidor *backend*. Permite a auditores, técnicos de soporte y administradores de TI llevar un registro organizado, multi-oficina y offline de los activos informáticos con una experiencia tipo aplicación nativa en dispositivos móviles.
 
 ## ✨ Características Principales
 
@@ -10,11 +12,20 @@ PocketInventory es una Aplicación Web Progresiva (PWA) de Página Única (SPA) 
   - Búsqueda en tiempo real multi-campo.
   - Paginación inteligente y ajustable (10, 25, 50, Todos).
   - Interfaz optimizada para pantallas táctiles (48px target).
+- **Módulo de Diagnóstico Técnico Integrado:**
+  - Checklist granular de Hardware (Energía, Almacenamiento, RAM, Térmico, Limpieza).
+  - Checklist granular de Software (Sistema Operativo, Seguridad, Rendimiento, Licencias).
+  - Subcategorías detalladas con descripciones técnicas (S.M.A.R.T., Firewall, Drivers, etc.).
+  - Vinculación automática del estado general con las subcategorías.
+- **Plan de Mantenimiento IT:**
+  - Generación automática de planes de mantenimiento preventivo y correctivo.
+  - Plan Maestro consolidado en formato de tabla horizontal (Landscape).
+  - Guías técnicas paso a paso para cada diagnóstico con fallos.
 - **Reportes PDF Profesionales:** 
-  - **Dashboard de Resumen:** Visualización instantánea de totales por estado (Activo, Stock, Reparación, Baja).
-  - **Identificación Formal:** Incluye datos del Auditor Técnico, Empresa Auditora y Responsable de Oficina.
-  - **Paginación en Reportes:** Numeración "Página X de Y" automática.
-  - **Propiedades Documentales:** Metadatos internos (Título, Autor) configurados.
+  - **Inventario de Equipos IT:** Dashboard de resumen, datos del auditor, paginación, firmas y sellos.
+  - **Plan de Mantenimiento IT:** Tabla consolidada con equipos, diagnósticos y acciones requeridas.
+  - **Firmas y Sellos:** Bloques de firma del auditor técnico, sello de la empresa y firma de aprobación.
+  - **Propiedades Documentales:** Metadatos internos (Título, Autor) configurados automáticamente.
 - **Atributos Dinámicos por Categoría:** Formulario inteligente que muestra campos específicos según el tipo de equipo (Laptop, Desktop, etc.).
 - **Privacidad Total:** Los datos se guardan localmente en el navegador (`localStorage`), garantizando que la información nunca salga de tu dispositivo.
 
@@ -40,14 +51,15 @@ Para disfrutar de la experiencia completa sin barras de navegación y con soport
 - **Núcleo:** HTML5, CSS3 (*Glassmorphism*), Vanilla JavaScript (ES6+).
 - **PWA:** Web App Manifest y Service Workers para almacenamiento en caché y offline.
 - **Librerías (CDN):**
-  - [jsPDF](https://github.com/parallax/jsPDF) & [jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable): Generación de reportes de auditoría.
+  - [jsPDF](https://github.com/parallax/jsPDF) & [jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable): Generación de reportes de auditoría y planes de mantenimiento.
+  - [SweetAlert2](https://sweetalert2.github.io/): Alertas y confirmaciones interactivas.
   - **Google Fonts:** Tipografía *Outfit* para una estética moderna y premium.
 
 ---
 
 ## 📜 Licencia y Derechos de Autor
 
-PocketInventory está protegido bajo la **Licencia Creative Commons Atribución-NoComercial 4.0 Internacional (CC BY-NC 4.0)**. 
+PocketITCheck está protegido bajo la **Licencia Creative Commons Atribución-NoComercial 4.0 Internacional (CC BY-NC 4.0)**. 
 
 Esto significa que eres libre de usar y modificar esta herramienta, siempre y cuando:
 1. **Atribución:** Mantengas el crédito al autor original (**Carlos Noguera**).
@@ -58,4 +70,4 @@ Esto significa que eres libre de usar y modificar esta herramienta, siempre y cu
 ## 👨‍💻 Créditos
 
 Desarrollado por **Carlos Noguera**  
-✉️ Contacto: [cnoguera.dev@gmail.com](mailto:cnoguera.dev@gmail.com)
+🌐 Web: [https://raziel986.github.io/PocketInventory/](https://raziel986.github.io/PocketInventory/)

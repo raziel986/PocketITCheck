@@ -1,7 +1,7 @@
 {
-    "name": "PocketInventory IT",
-    "short_name": "PocketInv",
-    "description": "Sistema de gestión de inventarios IT offline y profesional.",
+    "name": "PocketITCheck",
+    "short_name": "PocketIT",
+    "description": "Inventory | Diagnostics | Maintenance | Repairs - Sistema de gestión de inventarios IT offline y profesional.",
     "start_url": "index.html",
     "display": "standalone",
     "background_color": "#f8fafc",
