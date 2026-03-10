@@ -11,6 +11,26 @@ import { DIAG_SCHEMA } from './js/diagnostic.js';
 
 // --- Components ---
 
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
+    static getDerivedStateFromError(error) { return { hasError: true }; }
+    componentDidCatch(error, errorInfo) { console.error("React Error:", error, errorInfo); }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="p-5 text-center">
+                    <h2 className="text-danger">Something went wrong.</h2>
+                    <button className="btn btn-primary mt-3" onClick={() => window.location.reload()}>Reload App</button>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+
 const Sidebar = ({ view, setView, activeOffice, onBack, lang, onToggleLang, onSaveOffice, onAddEquipment }) => {
     return (
         <div className="sidebar p-3 bg-white border-end shadow-sm" style={{width: '300px'}}>
@@ -305,7 +325,11 @@ const App = () => {
     const [view, setView] = useState('offices');
     const [loading, setLoading] = useState(true);
     const [activeEquipIndex, setActiveEquipIndex] = useState(null);
-    const [lang, setLang] = useState(localStorage.getItem('pocketITCheckLang') || 'es');
+    const getInitialLang = () => {
+        const saved = localStorage.getItem('pocketITCheckLang');
+        return (saved === 'es' || saved === 'en') ? saved : 'es';
+    };
+    const [lang, setLang] = useState(getInitialLang());
 
     useEffect(() => {
         const init = async () => {
@@ -360,7 +384,8 @@ const App = () => {
     if (loading) return null;
 
     return (
-        <div className="d-flex flex-column flex-md-row min-vh-100 bg-light">
+        <ErrorBoundary>
+            <div className="d-flex flex-column flex-md-row min-vh-100 bg-light">
             {/* Sidebar with localization support */}
             {view !== 'diagnostic' && (
                 <Sidebar 
@@ -396,6 +421,7 @@ const App = () => {
             </main>
             <MobileNav view={view} setView={setView} lang={lang} />
         </div>
+        </ErrorBoundary>
     );
 };
 

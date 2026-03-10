@@ -520,6 +520,7 @@ export const translations = {
 };
 
 export function t(lang, key) {
+    if (!translations[lang]) return key;
     return translations[lang][key] || key;
 }
 
