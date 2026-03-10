@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -75,6 +75,7 @@
     <link rel="manifest" href="manifest.json">
 
     <!-- Librerías para Generación de PDF (jsPDF y jsPDF-AutoTable) - LOCAL para mayor velocidad -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="libs/jspdf.umd.min.js" defer></script>
     <script src="libs/jspdf-autotable.min.js" defer></script>
     <script src="libs/sweetalert2.all.min.js" defer></script>
@@ -127,6 +128,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Navigation Links -->
+            <nav class="nav-menu glass-card">
+                <ul>
+                    <li class="nav-item active" id="nav-offices" onclick="showSection('offices-section')">
+                        <span class="nav-icon">🏢</span>
+                        <span data-i18n="navOffices">Oficinas / Sedes</span>
+                    </li>
+                    <li class="nav-item" id="nav-dashboard" onclick="showSection('dashboard-section')">
+                        <span class="nav-icon">📊</span>
+                        <span data-i18n="navDashboard">Dashboard Pro</span>
+                    </li>
+                </ul>
+            </nav>
 
             <!-- VISTA: Formularios Nueva Oficina -->
             <div class="office-section glass-card" id="viewCreateOfficeSidebar">
@@ -425,6 +440,29 @@
             <div id="equipmentPagination" class="pagination-container"></div>
         </div>
 
+        <!-- SECCIÓN DASHBOARD (PRO) -->
+        <div class="main-content" id="dashboard-section" style="display: none;">
+            <div class="glass-card" style="margin-bottom: 1.5rem;">
+                <h2 style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+                    <span class="nav-icon">📊</span> <span data-i18n="navDashboard">Dashboard de Analíticas</span>
+                </h2>
+                <div class="dashboard-grid">
+                    <div class="chart-container glass-card">
+                        <h3 data-i18n="chartStatus">Estado de la Flota</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="chart-container glass-card">
+                        <h3 data-i18n="chartTypes">Distribución por Tipo</h3>
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-full glass-card" style="margin-top: 1.5rem;">
+                    <h3 data-i18n="chartHealth">Índice de Salud Global</h3>
+                    <canvas id="healthChart"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- CUERPO DERECHO: VISTA Diagnóstico Integrado -->
         <div class="output-section glass-card" id="diag-integrated-section" style="display: none;">
             <div class="diag-header"
@@ -535,8 +573,8 @@
         </footer>
     </div>
 
-    <!-- Script de lógica principal externalizado -->
-    <script src="app.js" defer></script>
+    <!-- Script de lógica principal módulo ESM -->
+    <script src="app.js" type="module"></script>
 </body>
 
 </html>
