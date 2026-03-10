@@ -177,9 +177,9 @@ function renderTable() {
     const o = appData.find(off => off.id === activeOfficeId);
     if (!o) return;
     const state = tableState.equipment;
+    const q = state.searchQuery;
     let filtered = o.inventory.map((item, idx) => ({ ...item, originalIndex: idx }))
         .filter(item => {
-            const q = state.searchQuery;
             return item.assetTag.toLowerCase().includes(q) || item.type.toLowerCase().includes(q) ||
                 item.model.toLowerCase().includes(q) || item.serial.toLowerCase().includes(q) ||
                 item.user.toLowerCase().includes(q) || item.notes.toLowerCase().includes(q);
