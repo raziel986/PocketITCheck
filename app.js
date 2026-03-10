@@ -3,9 +3,8 @@
  */
 
 import { initDB, getAllOffices, saveOffice, deleteOffice, migrateFromLocalStorage } from './js/db.js';
-import { applyTranslations, updatePagination, categoryFields } from './js/ui.js';
-import { translations, t, tPdf } from './js/translations.js';
-import * as PDF from './js/pdf_engine.js';
+import { applyTranslations, updatePagination } from './js/ui.js';
+import { t } from './js/translations.js';
 
 // State
 let currentLang = localStorage.getItem('pocketITCheckLang') || 'es';
@@ -21,26 +20,103 @@ let tableState = {
 };
 
 // DOM Cache
-const dom = {
-    splash: document.getElementById('splash-screen'),
-    sidebarOffices: document.getElementById('viewCreateOfficeSidebar'),
-    sidebarEquip: document.getElementById('viewAddEquipmentSidebar'),
-    viewOffices: document.getElementById('viewOfficesTable'),
-    viewEquip: document.getElementById('viewInventoryTable'),
-    officeForm: document.getElementById('officeForm'),
-    equipForm: document.getElementById('inventoryForm'),
-    officesTbody: document.getElementById('officesTableBody'),
-    equipTbody: document.getElementById('tableBody'),
-    activeOfficeSummary: document.getElementById('activeOfficeSummary'),
-    typeSelect: document.getElementById('type'),
-    dynamicContainer: document.getElementById('dynamicFieldsContainer'),
-    submitBtnOffice: document.getElementById('submitBtnOffice'),
-    cancelEditOfficeBtn: document.getElementById('cancelEditOfficeBtn'),
-    submitBtnEquip: document.getElementById('submitBtnEquipment'),
-    cancelEditBtn: document.getElementById('cancelEditBtn'),
-    countBadge: document.getElementById('itemCount'),
-    officeCountBadge: document.getElementById('officeCountBadge')
-};
+// DOM Cache — populated inside DOMContentLoaded
+let dom = {};
+
+document.addEventListener('DOMContentLoaded', () => {
+    dom = {
+        splash: document.getElementById('splash-screen'),
+        sidebarOffices: document.getElementById('viewCreateOfficeSidebar'),
+        sidebarEquip: document.getElementById('viewAddEquipmentSidebar'),
+        viewOffices: document.getElementById('viewOfficesTable'),
+        viewEquip: document.getElementById('viewInventoryTable'),
+        officeForm: document.getElementById('officeForm'),
+        equipForm: document.getElementById('inventoryForm'),
+        officesTbody: document.getElementById('officesTableBody'),
+        equipTbody: document.getElementById('tableBody'),
+        activeOfficeSummary: document.getElementById('activeOfficeSummary'),
+        typeSelect: document.getElementById('type'),
+        dynamicContainer: document.getElementById('dynamicFieldsContainer'),
+        submitBtnOffice: document.getElementById('submitBtnOffice'),
+        cancelEditOfficeBtn: document.getElementById('cancelEditOfficeBtn'),
+        submitBtnEquip: document.getElementById('submitBtnEquipment'),
+        cancelEditBtn: document.getElementById('cancelEditBtn'),
+        countBadge: document.getElementById('itemCount'),
+        officeCountBadge: document.getElementById('officeCountBadge')
+    };
+
+    // Office form submit
+    if (dom.officeForm) {
+        dom.officeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newOffice = {
+                id: editingOfficeId || Date.now().toString(),
+                company: document.getElementById('officeCompany').value.trim(),
+                depto: document.getElementById('officeDepto').value.trim(),
+                location: document.getElementById('officeLocation').value.trim(),
+                auditor: document.getElementById('officeAuditor').value.trim(),
+                auditorCompany: document.getElementById('officeAuditorCompany').value.trim(),
+                auditDate: document.getElementById('officeDate').value,
+                manager: document.getElementById('officeManager').value.trim(),
+                managerTitle: document.getElementById('officeManagerTitle').value.trim(),
+                inventory: editingOfficeId ? (appData.find(o => o.id === editingOfficeId) || { inventory: [] }).inventory : []
+            };
+            await saveOffice(newOffice);
+            if (editingOfficeId) {
+                const idx = appData.findIndex(o => o.id === editingOfficeId);
+                if (idx !== -1) appData[idx] = newOffice;
+                editingOfficeId = null;
+            } else {
+                appData.push(newOffice);
+            }
+            dom.officeForm.reset();
+            dom.sidebarOffices.style.display = 'none';
+            dom.viewOffices.style.display = 'block';
+            renderOfficesTable();
+            Swal.fire({ title: t(currentLang, 'successMsg'), icon: 'success', timer: 1200, showConfirmButton: false });
+        });
+    }
+
+    // Equipment form submit
+    if (dom.equipForm) {
+        dom.equipForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const o = appData.find(off => off.id === activeOfficeId);
+            if (!o) return;
+            const item = {
+                type: document.getElementById('type').value,
+                typeValue: document.getElementById('type').value,
+                model: document.getElementById('model').value.trim(),
+                serial: document.getElementById('serial').value.trim(),
+                assetTag: document.getElementById('assetTag').value.trim(),
+                status: document.getElementById('status').value,
+                hasWarranty: document.getElementById('hasWarranty').value,
+                purchaseDate: document.getElementById('purchaseDate').value,
+                warrantyDate: document.getElementById('warrantyDate').value,
+                user: document.getElementById('user').value.trim(),
+                notes: document.getElementById('notes').value.trim(),
+                diagnostics: editingIndex >= 0 && o.inventory[editingIndex] ? o.inventory[editingIndex].diagnostics : null,
+                maintenanceResult: editingIndex >= 0 && o.inventory[editingIndex] ? o.inventory[editingIndex].maintenanceResult : null
+            };
+            if (editingIndex >= 0) {
+                o.inventory[editingIndex] = { ...o.inventory[editingIndex], ...item };
+            } else {
+                o.inventory.push(item);
+            }
+            await saveOffice(o);
+            editingIndex = -1;
+            dom.equipForm.reset();
+            if (dom.dynamicContainer) dom.dynamicContainer.innerHTML = '';
+            dom.sidebarEquip.style.display = 'none';
+            dom.viewEquip.style.display = 'block';
+            renderTable();
+            Swal.fire({ title: t(currentLang, 'successMsg'), icon: 'success', timer: 1200, showConfirmButton: false });
+        });
+    }
+
+    // Start the app
+    init();
+});
 
 // Init
 async function init() {
@@ -312,75 +388,4 @@ window.deleteItem = async (idx) => {
     }
 };
 
-// Form Handlers
-dom.officeForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const newOffice = {
-        id: editingOfficeId || Date.now().toString(),
-        company: document.getElementById('officeCompany').value.trim(),
-        depto: document.getElementById('officeDepto').value.trim(),
-        location: document.getElementById('officeLocation').value.trim(),
-        auditor: document.getElementById('officeAuditor').value.trim(),
-        auditorCompany: document.getElementById('officeAuditorCompany').value.trim(),
-        auditDate: document.getElementById('officeDate').value,
-        manager: document.getElementById('officeManager').value.trim(),
-        managerTitle: document.getElementById('officeManagerTitle').value.trim(),
-        inventory: editingOfficeId ? (appData.find(o => o.id === editingOfficeId) || {inventory:[]}).inventory : []
-    };
-    
-    await saveOffice(newOffice);
-    if (editingOfficeId) {
-        const idx = appData.findIndex(o => o.id === editingOfficeId);
-        if (idx !== -1) appData[idx] = newOffice;
-        editingOfficeId = null;
-    } else {
-        appData.push(newOffice);
-    }
-    
-    dom.officeForm.reset();
-    // Return to the offices list
-    dom.sidebarOffices.style.display = 'none';
-    dom.viewOffices.style.display = 'block';
-    renderOfficesTable();
-    Swal.fire({ title: t(currentLang, 'successMsg'), icon: 'success', timer: 1200, showConfirmButton: false });
-});
 
-if (dom.equipForm) {
-    dom.equipForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const o = appData.find(off => off.id === activeOfficeId);
-        if (!o) return;
-        const item = {
-            type: document.getElementById('type').value,
-            typeValue: document.getElementById('type').value,
-            model: document.getElementById('model').value.trim(),
-            serial: document.getElementById('serial').value.trim(),
-            assetTag: document.getElementById('assetTag').value.trim(),
-            status: document.getElementById('status').value,
-            hasWarranty: document.getElementById('hasWarranty').value,
-            purchaseDate: document.getElementById('purchaseDate').value,
-            warrantyDate: document.getElementById('warrantyDate').value,
-            user: document.getElementById('user').value.trim(),
-            notes: document.getElementById('notes').value.trim(),
-            diagnostics: editingIndex >= 0 && o.inventory[editingIndex] ? o.inventory[editingIndex].diagnostics : null,
-            maintenanceResult: editingIndex >= 0 && o.inventory[editingIndex] ? o.inventory[editingIndex].maintenanceResult : null
-        };
-        if (editingIndex >= 0) {
-            o.inventory[editingIndex] = { ...o.inventory[editingIndex], ...item };
-        } else {
-            o.inventory.push(item);
-        }
-        await saveOffice(o);
-        editingIndex = -1;
-        dom.equipForm.reset();
-        if (dom.dynamicContainer) dom.dynamicContainer.innerHTML = '';
-        // Return to inventory table
-        dom.sidebarEquip.style.display = 'none';
-        dom.viewEquip.style.display = 'block';
-        renderTable();
-        Swal.fire({ title: t(currentLang, 'successMsg'), icon: 'success', timer: 1200, showConfirmButton: false });
-    });
-}
-
-// Run Init
-init();

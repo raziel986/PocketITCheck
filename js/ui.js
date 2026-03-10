@@ -2,7 +2,7 @@
  * ui.js - PocketITCheck UI & Interaction Module
  */
 
-import { t, tPdf } from './translations.js';
+import { t } from './translations.js';
 
 export function applyTranslations(currentLang) {
     document.querySelectorAll('[data-i18n]').forEach(el => {
