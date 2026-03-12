@@ -117,6 +117,26 @@
             font-size: 1rem;
         }
 
+        /* Hack para placeholder de fechas en mÃ³vil */
+        input[type="date"]::before {
+            content: attr(placeholder);
+            color: #9ca3af;
+            margin-right: 0.5rem;
+            display: none;
+        }
+
+        input[type="date"]:focus::before,
+        input[type="date"]:valid::before {
+            display: none;
+        }
+        
+        @media (max-width: 640px) {
+            input[type="date"]:not(:focus):not(:valid)::before {
+                display: inline;
+                content: attr(placeholder);
+            }
+        }
+
         input:not([type="checkbox"]):focus,
         select:focus {
             border-color: var(--primary);
@@ -941,3 +961,15 @@
             color: var(--primary);
             font-weight: 900;
         }
+/* Ajustes finales de armonía para el header en móvil */
+@media (max-width: 480px) {
+    .brand-card { padding: 1rem !important; }
+    .brand-card img { height: 42px !important; width: auto !important; }
+    .brand-card div[style*="font-size: 1.9rem"],
+    .brand-card span[style*="font-size: 1.9rem"] { font-size: 1.35rem !important; }
+    .brand-card div[data-i18n="appSlogan"],
+    .brand-card div[style*="font-size: 0.75rem"] { font-size: 0.62rem !important; letter-spacing: 0.1px !important; margin-top: 2px !important; }
+    .lang-toggle-container { padding: 0.15rem; }
+    .switch { width: 50px; height: 22px; }
+    .slider-text { font-size: 9px; }
+}

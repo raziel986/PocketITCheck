@@ -401,6 +401,177 @@ window.deleteItem = async (idx) => {
 };
 
 
+
+// Diagnostic Functions
+window.openDiagnostic = (idx) => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (!o) return;
+    const item = o.inventory[idx];
+    if (!item) return;
+
+    diagnosticIndex = idx;
+    const diagSection = document.getElementById('diag-integrated-section');
+    if (diagSection) diagSection.style.display = 'block';
+    if (dom.viewEquip) dom.viewEquip.style.display = 'none';
+
+    const titleEl = document.getElementById('diag-title');
+    const subtitleEl = document.getElementById('diag-subtitle');
+    if (titleEl) titleEl.textContent = `🩺 ${t(currentLang, 'diagTitle')}`;
+    if (subtitleEl) subtitleEl.textContent = `${item.assetTag} - ${item.model}`;
+    
+    if (!item.diagnostics) {
+        item.diagnostics = { hardware: {}, software: {}, notes: '' };
+    }
+    const notesInput = document.getElementById('diag-notes-input');
+    if (notesInput) notesInput.value = item.diagnostics.notes || '';
+
+    const container = document.getElementById('diag-grid-container');
+    if (container) {
+        container.innerHTML = '';
+        const categories = [
+            { key: 'hardware', items: ['power', 'storage', 'ram', 'temp', 'clean'] },
+            { key: 'software', items: ['os', 'security', 'performance', 'license'] }
+        ];
+
+        categories.forEach(cat => {
+            const section = document.createElement('div');
+            section.className = 'diag-card';
+            section.innerHTML = `<h3 style="color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1rem;">${t(currentLang, cat.key)}</h3>`;
+            
+            cat.items.forEach(it => {
+                const isOk = item.diagnostics[cat.key][it] !== false;
+                const div = document.createElement('div');
+                div.className = 'diag-ok-container';
+                div.innerHTML = `
+                    <input type="checkbox" id="diag-${cat.key}-${it}" ${isOk ? 'checked' : ''} onchange="updateDiagState('${cat.key}', '${it}', this.checked)">
+                    <label for="diag-${cat.key}-${it}" style="margin-bottom:0; cursor:pointer;">
+                        <strong>${t(currentLang, it)}</strong>
+                    </label>`;
+                section.appendChild(div);
+            });
+            container.appendChild(section);
+        });
+    }
+};
+
+window.updateDiagState = (cat, it, val) => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (o && o.inventory[diagnosticIndex]) {
+        if (!o.inventory[diagnosticIndex].diagnostics) o.inventory[diagnosticIndex].diagnostics = { hardware:{}, software:{}, notes:'' };
+        o.inventory[diagnosticIndex].diagnostics[cat][it] = val;
+    }
+};
+
+window.saveIntegratedDiagnosticFlow = async () => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (o && o.inventory[diagnosticIndex]) {
+        const notesInput = document.getElementById('diag-notes-input');
+        if (notesInput) o.inventory[diagnosticIndex].diagnostics.notes = notesInput.value;
+        await saveOffice(o);
+        closeIntegratedDiagnostic();
+        renderTable();
+        if (typeof Swal !== 'undefined') Swal.fire({ title: t(currentLang, 'successMsg'), icon: 'success', timer: 1200, showConfirmButton: false });
+    }
+};
+
+window.closeIntegratedDiagnostic = () => {
+    diagnosticIndex = null;
+    const diagSection = document.getElementById('diag-integrated-section');
+    if (diagSection) diagSection.style.display = 'none';
+    if (dom.viewEquip) dom.viewEquip.style.display = 'block';
+};
+
+// Maintenance Results Functions
+window.openMaintenanceResult = (idx) => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (!o) return;
+    const item = o.inventory[idx];
+    if (!item) return;
+
+    resultIndex = idx;
+    const resultSection = document.getElementById('result-integrated-section');
+    if (resultSection) resultSection.style.display = 'block';
+    if (dom.viewEquip) dom.viewEquip.style.display = 'none';
+
+    const titleEl = document.getElementById('result-title');
+    const subtitleEl = document.getElementById('result-subtitle');
+    if (titleEl) titleEl.textContent = `✅ ${t(currentLang, 'maintResult')}`;
+    if (subtitleEl) subtitleEl.textContent = `${item.assetTag} - ${item.model}`;
+
+    if (!item.maintenanceResult) {
+        item.maintenanceResult = { status: 'Pendiente', date: new Date().toISOString().split('T')[0], notes: '', resolvedItems: [] };
+    }
+
+    const statusEl = document.getElementById('result-status');
+    const dateEl = document.getElementById('result-date');
+    const notesEl = document.getElementById('result-notes-input');
+    if (statusEl) statusEl.value = item.maintenanceResult.status || 'Pendiente';
+    if (dateEl) dateEl.value = item.maintenanceResult.date || '';
+    if (notesEl) notesEl.value = item.maintenanceResult.notes || '';
+
+    const container = document.getElementById('result-items-container');
+    if (container) {
+        container.innerHTML = '';
+        if (item.diagnostics) {
+            const failedItems = [];
+            ['hardware', 'software'].forEach(cat => {
+                Object.keys(item.diagnostics[cat] || {}).forEach(key => {
+                    if (item.diagnostics[cat][key] === false) {
+                        failedItems.push({ cat, key });
+                    }
+                });
+            });
+
+            failedItems.forEach(fi => {
+                const isResolved = (item.maintenanceResult.resolvedItems || []).includes(`${fi.cat}:${fi.key}`);
+                const div = document.createElement('div');
+                div.className = 'diag-ok-container';
+                div.style.background = isResolved ? '#d1fae5' : '#fee2e2';
+                div.innerHTML = `
+                    <input type="checkbox" ${isResolved ? 'checked' : ''} onchange="toggleResolvedItem('${fi.cat}', '${fi.key}', this.checked)">
+                    <span style="font-size: 0.85rem;">${t(currentLang, fi.key)}</span>`;
+                container.appendChild(div);
+            });
+        }
+    }
+};
+
+window.toggleResolvedItem = (cat, key, val) => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (o && o.inventory[resultIndex]) {
+        const id = `${cat}:${key}`;
+        if (!o.inventory[resultIndex].maintenanceResult.resolvedItems) o.inventory[resultIndex].maintenanceResult.resolvedItems = [];
+        const items = o.inventory[resultIndex].maintenanceResult.resolvedItems;
+        if (val && !items.includes(id)) items.push(id);
+        else if (!val && items.includes(id)) o.inventory[resultIndex].maintenanceResult.resolvedItems = items.filter(x => x !== id);
+        openMaintenanceResult(resultIndex); // Refresh colors
+    }
+};
+
+window.saveMaintenanceResult = async () => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (o && o.inventory[resultIndex]) {
+        const statusEl = document.getElementById('result-status');
+        const dateEl = document.getElementById('result-date');
+        const notesEl = document.getElementById('result-notes-input');
+        if (statusEl) o.inventory[resultIndex].maintenanceResult.status = statusEl.value;
+        if (dateEl) o.inventory[resultIndex].maintenanceResult.date = dateEl.value;
+        if (notesEl) o.inventory[resultIndex].maintenanceResult.notes = notesEl.value;
+        await saveOffice(o);
+        closeMaintenanceResult();
+        renderTable();
+        if (typeof Swal !== 'undefined') Swal.fire({ title: t(currentLang, 'successMsg'), icon: 'success', timer: 1200, showConfirmButton: false });
+    }
+};
+
+window.closeMaintenanceResult = () => {
+    resultIndex = null;
+    const resultSection = document.getElementById('result-integrated-section');
+    if (resultSection) resultSection.style.display = 'none';
+    if (dom.viewEquip) dom.viewEquip.style.display = 'block';
+};
+
+
 // Export functions for HTML
 window.exportToCSV = () => {
     const o = appData.find(off => off.id === activeOfficeId);
