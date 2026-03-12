@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <div class="container" style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+    <div class="container" style="margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
         <!-- Barra Lateral / Brand -->
         <div class="brand-card glass-card" style="padding: 1.25rem 2rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
@@ -296,12 +296,11 @@
         <div class="output-section glass-card" id="viewOfficesTable">
             <h2
                 style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                <span data-i18n="officeManagerSub">📋 Gestor de Oficinas y Clientes</span>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <span id="officeCountBadge"
+                <span data-i18n="officeManagerSub">📋 Gestor de Oficinas y Clientes</span><span id="officeCountBadge"
                         style="font-size: 0.9rem; background: #e0e7ff; color: #4338ca; padding: 0.25rem 0.75rem; border-radius: 9999px;">
                         0 oficinas
                     </span>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
                     <button class="btn btn-submit" style="padding: 0.4rem 0.8rem; min-height: 0; font-size: 0.9rem;" onclick="showAddOfficeForm()" data-i18n="newOffice">+ Nueva Oficina</button>
                 </div>
             </h2>
@@ -381,7 +380,7 @@
             <h2
                 style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                    <span>📋 Lista de Equipos</span>
+                    <span>📋 Inventario de Equipos</span>
                     <span id="itemCount" class="badge-count" style="margin-right: 10px;">0 items</span>
                     <button class="btn btn-submit" style="padding: 0.4rem 0.8rem; min-height: 0; font-size: 0.9rem;" onclick="showAddEquipmentForm()" data-i18n="addEquipment">+ Nuevo Equipo</button>
                 </div>

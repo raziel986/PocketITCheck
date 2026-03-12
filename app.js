@@ -120,16 +120,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Init
 async function init() {
-    await migrateFromLocalStorage();
-    appData = await getAllOffices();
-    applyTranslations(currentLang);
-    renderOfficesTable();
-    
-    if (dom.splash) {
-        setTimeout(() => {
-            dom.splash.classList.add('splash-hidden');
-            setTimeout(() => dom.splash.remove(), 500);
-        }, 600);
+    try {
+        await migrateFromLocalStorage();
+        appData = await getAllOffices();
+        applyTranslations(currentLang);
+        renderOfficesTable();
+    } catch (err) {
+        console.error('Initialization error:', err);
+        // Ensure even if there's an error, we show some UI or message
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Error de Inicio',
+                text: 'Hubo un problema al cargar los datos. Por favor, recarga la página.',
+                icon: 'error'
+            });
+        }
+    } finally {
+        if (dom.splash) {
+            setTimeout(() => {
+                dom.splash.classList.add('splash-hidden');
+                setTimeout(() => dom.splash.remove(), 500);
+            }, 600);
+        }
     }
 }
 
@@ -386,6 +398,52 @@ window.deleteItem = async (idx) => {
         renderTable();
         Swal.fire({ title: t(currentLang, 'deletedMsg'), icon: 'success', timer: 1500, showConfirmButton: false });
     }
+};
+
+
+// Export functions for HTML
+window.exportToCSV = () => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (!o || o.inventory.length === 0) return;
+    
+    let csv = "Asset Tag,Type,Model,Serial,Status,User,Notes\n";
+    o.inventory.forEach(item => {
+        csv += `"${item.assetTag}","${item.type}","${item.model}","${item.serial}","${item.status}","${item.user}","${item.notes}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `Inventory_${o.company}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
+
+window.exportToPDF = () => {
+    Swal.fire({
+        title: 'Exportar PDF',
+        text: 'La función de exportación a PDF se está restaurando. Por ahora usa la función de impresión del navegador.',
+        icon: 'info'
+    });
+};
+
+window.generateMasterMaintenancePlanPDF = () => {
+    Swal.fire({
+        title: 'Plan Maestro',
+        text: 'La generación del Plan Maestro de Mantenimiento se está configurando.',
+        icon: 'info'
+    });
+};
+
+window.generateResultsReportPDF = () => {
+    Swal.fire({
+        title: 'Informe de Resultados',
+        text: 'La generación del Informe de Resultados se está configurando.',
+        icon: 'info'
+    });
 };
 
 
