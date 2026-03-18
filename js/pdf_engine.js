@@ -145,7 +145,7 @@ export function addModelPageNumbers(doc, currentLang) {
         doc.setFontSize(7);
         doc.setFont("helvetica", "italic");
         doc.setTextColor(150, 150, 150);
-        doc.text(`${tPdf(currentLang, 'pdfGeneratedBy')} | https://raziel986.github.io/PocketInventory/`, 15, ph - 7);
+        doc.text(`${tPdf(currentLang, 'pdfGeneratedBy')} | https://raziel986.github.io/PocketITCheck/`, 15, ph - 7);
         doc.text(`${tPdf(currentLang, 'pdfPage')} ${i}`, pw - 15, ph - 7, { align: 'right' });
     }
 }
