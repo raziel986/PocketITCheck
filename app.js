@@ -674,29 +674,88 @@ window.openMaintenanceResult = (idx) => {
     if (container) {
         container.innerHTML = '';
         const diagObj = item.diagnostics || {};
-        const failedItems = [];
+        const resolvedItems = item.maintenanceResult.resolvedItems || [];
+
         DIAG_STRUCTURE.forEach(cat => {
+            // Collect only failed items for this category
+            let hasFailedItems = false;
+            const catFailedGroups = [];
+
             cat.groups.forEach(group => {
+                const failedInGroup = [];
                 group.items.forEach(it => {
                     const isOk = (diagObj[cat.category] || {})[it.id] === true;
                     if (!isOk) {
-                        const explicitLabel = `[${t(currentLang, cat.category)} / ${t(currentLang, group.key)}] ${t(currentLang, `desc_${it.id}`)}`;
-                        failedItems.push({ cat: cat.category, id: it.id, labelText: explicitLabel });
+                        failedInGroup.push(it);
+                        hasFailedItems = true;
                     }
                 });
+                if (failedInGroup.length > 0) {
+                    catFailedGroups.push({ group, failedItems: failedInGroup });
+                }
             });
-        });
 
-        failedItems.forEach(fi => {
-            const isResolved = (item.maintenanceResult.resolvedItems || []).includes(`${fi.cat}:${fi.id}`);
-            const div = document.createElement('div');
-            div.className = 'diag-ok-container';
-            div.style.background = isResolved ? '#d1fae5' : '#fee2e2';
-            div.style.border = isResolved ? '1px solid #34d399' : '1px solid #fca5a5';
-            div.innerHTML = `
-                <input type="checkbox" ${isResolved ? 'checked' : ''} onchange="toggleResolvedItem('${fi.cat}', '${fi.id}', this.checked)">
-                <span style="font-size: 0.85rem; font-weight: 500;">${fi.labelText}</span>`;
-            container.appendChild(div);
+            if (!hasFailedItems) return;
+
+            // Build category card (like diagnostic view)
+            const section = document.createElement('div');
+            section.className = 'diag-card';
+
+            // Check if all failed items in this category are resolved
+            const allResolved = catFailedGroups.every(g =>
+                g.failedItems.every(it => resolvedItems.includes(`${cat.category}:${it.id}`))
+            );
+
+            section.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="color: ${allResolved ? '#059669' : '#dc2626'}; margin: 0;">${allResolved ? '✅' : '⚠️'} ${t(currentLang, cat.category)}</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #64748b;">
+                        <label for="resolve-master-${cat.category}" style="cursor: pointer; font-weight: 500;">${t(currentLang, 'checkAll')}</label>
+                        <input type="checkbox" id="resolve-master-${cat.category}" ${allResolved ? 'checked' : ''} 
+                            style="width: 18px; height: 18px; cursor: pointer;"
+                            onchange="toggleResolveCategoryMaster('${cat.category}', this.checked)">
+                    </div>
+                </div>`;
+
+            catFailedGroups.forEach(({ group, failedItems }) => {
+                const groupDiv = document.createElement('div');
+                groupDiv.style.marginBottom = '1.5rem';
+                groupDiv.innerHTML = `<h4 style="margin: 0 0 0.8rem 0; color: #475569; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626;"></span> ${t(currentLang, group.key)}</h4>`;
+
+                const itemsList = document.createElement('div');
+                itemsList.style.display = 'flex';
+                itemsList.style.flexDirection = 'column';
+                itemsList.style.gap = '0.75rem';
+                itemsList.style.paddingLeft = '1.2rem';
+
+                failedItems.forEach(it => {
+                    const isResolved = resolvedItems.includes(`${cat.category}:${it.id}`);
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'diag-item-row';
+                    itemDiv.style.display = 'flex';
+                    itemDiv.style.alignItems = 'flex-start';
+                    itemDiv.style.gap = '0.75rem';
+                    itemDiv.style.padding = '0.5rem 0.75rem';
+                    itemDiv.style.borderRadius = '8px';
+                    itemDiv.style.background = isResolved ? '#d1fae5' : '#fee2e2';
+                    itemDiv.style.border = isResolved ? '1px solid #34d399' : '1px solid #fca5a5';
+                    itemDiv.style.transition = 'all 0.2s ease';
+
+                    itemDiv.innerHTML = `
+                        <input type="checkbox" id="resolve-${cat.category}-${it.id}" ${isResolved ? 'checked' : ''} 
+                            style="width: 18px; height: 18px; margin-top: 3px; cursor: pointer;"
+                            onchange="toggleResolvedItem('${cat.category}', '${it.id}', this.checked)">
+                        <label for="resolve-${cat.category}-${it.id}" style="cursor: pointer; flex: 1;">
+                            <div style="font-weight: 600; font-size: 0.9rem; color: ${isResolved ? '#065f46' : '#991b1b'};">${isResolved ? '✅' : '❌'} ${t(currentLang, it.label)}</div>
+                            <div style="font-size: 0.8rem; color: #64748b; line-height: 1.3;">${t(currentLang, it.desc)}</div>
+                        </label>`;
+                    itemsList.appendChild(itemDiv);
+                });
+                groupDiv.appendChild(itemsList);
+                section.appendChild(groupDiv);
+            });
+            container.appendChild(section);
         });
     }
 };
@@ -710,6 +769,32 @@ window.toggleResolvedItem = (cat, key, val) => {
         if (val && !items.includes(id)) items.push(id);
         else if (!val && items.includes(id)) o.inventory[resultIndex].maintenanceResult.resolvedItems = items.filter(x => x !== id);
         openMaintenanceResult(resultIndex); // Refresh colors
+    }
+};
+
+window.toggleResolveCategoryMaster = (catName, val) => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (o && o.inventory[resultIndex]) {
+        const item = o.inventory[resultIndex];
+        if (!item.maintenanceResult.resolvedItems) item.maintenanceResult.resolvedItems = [];
+        const diagObj = item.diagnostics || {};
+        const catStruct = DIAG_STRUCTURE.find(c => c.category === catName);
+        if (!catStruct) return;
+
+        catStruct.groups.forEach(group => {
+            group.items.forEach(it => {
+                const isOk = (diagObj[catName] || {})[it.id] === true;
+                if (!isOk) {
+                    const id = `${catName}:${it.id}`;
+                    if (val && !item.maintenanceResult.resolvedItems.includes(id)) {
+                        item.maintenanceResult.resolvedItems.push(id);
+                    } else if (!val && item.maintenanceResult.resolvedItems.includes(id)) {
+                        item.maintenanceResult.resolvedItems = item.maintenanceResult.resolvedItems.filter(x => x !== id);
+                    }
+                }
+            });
+        });
+        openMaintenanceResult(resultIndex); // Refresh
     }
 };
 
