@@ -282,7 +282,14 @@ export const translations = {
         firm: "Firmware", ports: "Puertos",
         gpu: "Gráficos / GPU", screen: "Tipo de Pantalla",
         storage_type: "Tipo de Disco", toner: "Tóner / Tinta",
-        volt: "Voltaje / Watts"
+        volt: "Voltaje / Watts",
+        
+        // Headers PDF Inventario
+        pdfColID: "ID Activo",
+        pdfColStatus: "Estado",
+        pdfColCatMod: "Categoría / Modelo",
+        pdfColSNAsig: "S/N / Asignación",
+        pdfColSpecs: "Especificaciones"
     },
     en: {
         appName: "PocketITCheck",
@@ -563,7 +570,14 @@ export const translations = {
         firm: "Firmware", ports: "Ports",
         gpu: "Graphics / GPU", screen: "Display Type",
         storage_type: "Storage Type", toner: "Toner / Ink",
-        volt: "Voltage / Watts"
+        volt: "Voltage / Watts",
+
+        // Headers PDF Inventario
+        pdfColID: "Asset ID",
+        pdfColStatus: "Status",
+        pdfColCatMod: "Category / Model",
+        pdfColSNAsig: "S/N / Assignment",
+        pdfColSpecs: "Specifications"
     }
 };
 

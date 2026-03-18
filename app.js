@@ -782,11 +782,11 @@ window.exportToPDF = () => {
     doc.autoTable({
         startY: y + 2,
         head: [[
-            tPdf(currentLang, 'assetTagLabel'),
-            tPdf(currentLang, 'pdfStatus'),
-            tPdf(currentLang, 'pdfCategory') + ' / ' + tPdf(currentLang, 'pdfModel'),
-            tPdf(currentLang, 'serialLabel') + ' / ' + tPdf(currentLang, 'assignmentLabel'),
-            tPdf(currentLang, 'specsCol')
+            tPdf(currentLang, 'pdfColID'),
+            tPdf(currentLang, 'pdfColStatus'),
+            tPdf(currentLang, 'pdfColCatMod'),
+            tPdf(currentLang, 'pdfColSNAsig'),
+            tPdf(currentLang, 'pdfColSpecs')
         ]],
         body: tableData,
         theme: 'grid',
