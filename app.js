@@ -644,7 +644,8 @@ window.openMaintenanceResult = (idx) => {
             DIAG_STRUCTURE.forEach(cat => {
                 cat.groups.forEach(group => {
                     group.items.forEach(it => {
-                        if (item.diagnostics[cat.category][it.id] === false) {
+                        const isOk = (item.diagnostics[cat.category] || {})[it.id] === true;
+                        if (!isOk) {
                             failedItems.push({ cat: cat.category, id: it.id, label: it.label });
                         }
                     });
@@ -825,12 +826,15 @@ window.generateMasterMaintenancePlanPDF = () => {
         const issues = [];
         const actions = [];
         if (item.diagnostics) {
-            ['hardware', 'software'].forEach(cat => {
-                Object.keys(item.diagnostics[cat] || {}).forEach(key => {
-                    if (item.diagnostics[cat][key] === false) {
-                        issues.push(`${t(currentLang, key)}`);
-                        actions.push(t(currentLang, `act_${key}`));
-                    }
+            DIAG_STRUCTURE.forEach(cat => {
+                cat.groups.forEach(group => {
+                    group.items.forEach(it => {
+                        const isOk = (item.diagnostics[cat.category] || {})[it.id] === true;
+                        if (!isOk) {
+                            issues.push(`${t(currentLang, it.id)}`);
+                            actions.push(t(currentLang, `act_${it.id}`));
+                        }
+                    });
                 });
             });
         }
