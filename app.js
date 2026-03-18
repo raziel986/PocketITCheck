@@ -639,31 +639,30 @@ window.openMaintenanceResult = (idx) => {
     const container = document.getElementById('result-items-container');
     if (container) {
         container.innerHTML = '';
-        if (item.diagnostics) {
-            const failedItems = [];
-            DIAG_STRUCTURE.forEach(cat => {
-                cat.groups.forEach(group => {
-                    group.items.forEach(it => {
-                        const isOk = (item.diagnostics[cat.category] || {})[it.id] === true;
-                        if (!isOk) {
-                            failedItems.push({ cat: cat.category, id: it.id, label: it.label });
-                        }
-                    });
+        const diagObj = item.diagnostics || {};
+        const failedItems = [];
+        DIAG_STRUCTURE.forEach(cat => {
+            cat.groups.forEach(group => {
+                group.items.forEach(it => {
+                    const isOk = (diagObj[cat.category] || {})[it.id] === true;
+                    if (!isOk) {
+                        failedItems.push({ cat: cat.category, id: it.id, label: it.label });
+                    }
                 });
             });
+        });
 
-            failedItems.forEach(fi => {
-                const isResolved = (item.maintenanceResult.resolvedItems || []).includes(`${fi.cat}:${fi.id}`);
-                const div = document.createElement('div');
-                div.className = 'diag-ok-container';
-                div.style.background = isResolved ? '#d1fae5' : '#fee2e2';
-                div.style.border = isResolved ? '1px solid #34d399' : '1px solid #fca5a5';
-                div.innerHTML = `
-                    <input type="checkbox" ${isResolved ? 'checked' : ''} onchange="toggleResolvedItem('${fi.cat}', '${fi.id}', this.checked)">
-                    <span style="font-size: 0.85rem; font-weight: 500;">${t(currentLang, fi.label)}</span>`;
-                container.appendChild(div);
-            });
-        }
+        failedItems.forEach(fi => {
+            const isResolved = (item.maintenanceResult.resolvedItems || []).includes(`${fi.cat}:${fi.id}`);
+            const div = document.createElement('div');
+            div.className = 'diag-ok-container';
+            div.style.background = isResolved ? '#d1fae5' : '#fee2e2';
+            div.style.border = isResolved ? '1px solid #34d399' : '1px solid #fca5a5';
+            div.innerHTML = `
+                <input type="checkbox" ${isResolved ? 'checked' : ''} onchange="toggleResolvedItem('${fi.cat}', '${fi.id}', this.checked)">
+                <span style="font-size: 0.85rem; font-weight: 500;">${t(currentLang, fi.label)}</span>`;
+            container.appendChild(div);
+        });
     }
 };
 
@@ -825,19 +824,18 @@ window.generateMasterMaintenancePlanPDF = () => {
     const failedItems = o.inventory.map(item => {
         const issues = [];
         const actions = [];
-        if (item.diagnostics) {
-            DIAG_STRUCTURE.forEach(cat => {
-                cat.groups.forEach(group => {
-                    group.items.forEach(it => {
-                        const isOk = (item.diagnostics[cat.category] || {})[it.id] === true;
-                        if (!isOk) {
-                            issues.push(`${t(currentLang, it.id)}`);
-                            actions.push(t(currentLang, `act_${it.id}`));
-                        }
-                    });
+        const diagObj = item.diagnostics || {};
+        DIAG_STRUCTURE.forEach(cat => {
+            cat.groups.forEach(group => {
+                group.items.forEach(it => {
+                    const isOk = (diagObj[cat.category] || {})[it.id] === true;
+                    if (!isOk) {
+                        issues.push(`${t(currentLang, it.id)}`);
+                        actions.push(t(currentLang, `act_${it.id}`));
+                    }
                 });
             });
-        }
+        });
         return issues.length > 0 ? { ...item, issues, actions } : null;
     }).filter(x => x !== null);
 
