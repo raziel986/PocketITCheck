@@ -221,12 +221,26 @@ window.selectOffice = (id) => {
 window.showAddEquipmentForm = () => {
     editingIndex = -1;
     dom.equipForm.reset();
+    const hw = document.getElementById('hasWarranty');
+    if (hw) hw.value = 'No';
+    if (typeof window.toggleDates === 'function') window.toggleDates();
     if (dom.dynamicContainer) dom.dynamicContainer.innerHTML = '';
     const title = document.getElementById('equipmentFormTitle');
     if (title) title.setAttribute('data-i18n', 'newEquipment');
+    if (dom.cancelEditBtn) dom.cancelEditBtn.style.display = 'none';
+    const subBtn = document.getElementById('submitBtnEquipment');
+    if (subBtn) subBtn.innerHTML = '➕ ' + t(currentLang, 'addEquipment');
     // Show the form, hide inventory table
     dom.viewEquip.style.display = 'none';
     dom.sidebarEquip.style.display = 'block';
+};
+
+window.cancelEdit = () => {
+    window.hideAddEquipmentForm();
+};
+
+window.cancelEditOffice = () => {
+    window.hideAddOfficeForm();
 };
 
 window.hideAddEquipmentForm = () => {
@@ -389,10 +403,10 @@ function renderTable() {
                 </td>
                 <td data-label="${t(currentLang,'actionsLabel')}" class="action-col">
                     <div class="action-icons">
-                        <button class="icon-btn icon-btn-info" onclick="editEquipment(${item.originalIndex})" title="Editar">✏️</button>
-                        ${hasDiag || !hasMaint ? `<button class="icon-btn icon-btn-info" onclick="openDiagnostic(${item.originalIndex})" title="Diagnóstico">🩺</button>` : ''}
-                        ${hasMaint ? `<button class="icon-btn" style="background:#d1fae5;color:#065f46;" onclick="openMaintenanceResult(${item.originalIndex})" title="Resultado">✅</button>` : ''}
-                        <button class="icon-btn icon-btn-danger" onclick="deleteItem(${item.originalIndex})" title="Eliminar">🗑️</button>
+                        <button class="icon-btn icon-btn-info" onclick="editEquipment(${item.originalIndex})" title="${t(currentLang,'editEquipment')}">✏️</button>
+                        <button class="icon-btn icon-btn-info" onclick="openDiagnostic(${item.originalIndex})" title="${t(currentLang,'integratedDiag')}">🩺</button>
+                        <button class="icon-btn" style="background:${hasMaint ? '#d1fae5' : '#fef3c7'};color:${hasMaint ? '#065f46' : '#92400e'};" onclick="openMaintenanceResult(${item.originalIndex})" title="${t(currentLang,'maintResult')}">✅</button>
+                        <button class="icon-btn icon-btn-danger" onclick="deleteItem(${item.originalIndex})" title="${t(currentLang,'deleteBtn')}">🗑️</button>
                     </div>
                 </td>`;
             dom.equipTbody.appendChild(tr);
@@ -412,7 +426,8 @@ window.editEquipment = (idx) => {
     document.getElementById('serial').value = item.serial || '';
     document.getElementById('assetTag').value = item.assetTag || '';
     document.getElementById('status').value = item.status || 'Activo';
-    document.getElementById('hasWarranty').value = item.hasWarranty || 'Sí';
+    document.getElementById('hasWarranty').value = item.hasWarranty || 'No';
+    if (typeof window.toggleDates === 'function') window.toggleDates();
     document.getElementById('purchaseDate').value = item.purchaseDate || '';
     document.getElementById('warrantyDate').value = item.warrantyDate || '';
     document.getElementById('user').value = item.user || '';
@@ -420,8 +435,10 @@ window.editEquipment = (idx) => {
     // Show form, hide table
     dom.viewEquip.style.display = 'none';
     dom.sidebarEquip.style.display = 'block';
-    const title = document.getElementById('equipmentFormTitle');
     if (title) title.textContent = '📋 ' + t(currentLang, 'editEquipment');
+    if (dom.cancelEditBtn) dom.cancelEditBtn.style.display = 'inline-block';
+    const subBtn = document.getElementById('submitBtnEquipment');
+    if (subBtn) subBtn.innerHTML = '💾 ' + t(currentLang, 'saveAsset');
 
     window.updateDynamicFields(item.type);
     if (item.specs) {
@@ -455,6 +472,23 @@ window.updateDynamicFields = (type) => {
         grid.appendChild(group);
     });
     dom.dynamicContainer.appendChild(grid);
+};
+
+window.toggleDates = () => {
+    const val = document.getElementById('hasWarranty').value;
+    const pContainer = document.getElementById('purchaseDateContainer');
+    const wContainer = document.getElementById('warrantyDateContainer');
+    if (val === 'Sí') {
+        if (pContainer) pContainer.style.display = 'block';
+        if (wContainer) wContainer.style.display = 'block';
+    } else {
+        if (pContainer) pContainer.style.display = 'none';
+        if (wContainer) wContainer.style.display = 'none';
+        const pInput = document.getElementById('purchaseDate');
+        const wInput = document.getElementById('warrantyDate');
+        if (pInput) pInput.value = '';
+        if (wInput) wInput.value = '';
+    }
 };
 
 window.deleteItem = async (idx) => {
@@ -646,7 +680,8 @@ window.openMaintenanceResult = (idx) => {
                 group.items.forEach(it => {
                     const isOk = (diagObj[cat.category] || {})[it.id] === true;
                     if (!isOk) {
-                        failedItems.push({ cat: cat.category, id: it.id, label: `desc_${it.id}` });
+                        const explicitLabel = `[${t(currentLang, cat.category)} / ${t(currentLang, group.key)}] ${t(currentLang, `desc_${it.id}`)}`;
+                        failedItems.push({ cat: cat.category, id: it.id, labelText: explicitLabel });
                     }
                 });
             });
@@ -660,7 +695,7 @@ window.openMaintenanceResult = (idx) => {
             div.style.border = isResolved ? '1px solid #34d399' : '1px solid #fca5a5';
             div.innerHTML = `
                 <input type="checkbox" ${isResolved ? 'checked' : ''} onchange="toggleResolvedItem('${fi.cat}', '${fi.id}', this.checked)">
-                <span style="font-size: 0.85rem; font-weight: 500;">${t(currentLang, fi.label)}</span>`;
+                <span style="font-size: 0.85rem; font-weight: 500;">${fi.labelText}</span>`;
             container.appendChild(div);
         });
     }
@@ -830,7 +865,8 @@ window.generateMasterMaintenancePlanPDF = () => {
                 group.items.forEach(it => {
                     const isOk = (diagObj[cat.category] || {})[it.id] === true;
                     if (!isOk) {
-                        issues.push(`${t(currentLang, `desc_${it.id}`)}`);
+                        const explicitIssue = `[${t(currentLang, cat.category)} / ${t(currentLang, group.key)}] ${t(currentLang, `desc_${it.id}`)}`;
+                        issues.push(explicitIssue);
                         actions.push(`${t(currentLang, `act_${it.id}`)}`);
                     }
                 });
