@@ -503,7 +503,19 @@ window.openDiagnostic = (idx) => {
         DIAG_STRUCTURE.forEach(cat => {
             const section = document.createElement('div');
             section.className = 'diag-card';
-            section.innerHTML = `<h3 style="color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">${t(currentLang, cat.category)}</h3>`;
+            
+            const allChecked = cat.groups.every(g => g.items.every(it => (item.diagnostics[cat.category] || {})[it.id] === true));
+
+            section.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--primary); margin: 0;">${t(currentLang, cat.category)}</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #64748b;">
+                        <label for="master-${cat.category}" style="cursor: pointer; font-weight: 500;">${t(currentLang, 'checkAll')}</label>
+                        <input type="checkbox" id="master-${cat.category}" ${allChecked ? 'checked' : ''} 
+                            style="width: 18px; height: 18px; cursor: pointer;"
+                            onchange="toggleCategoryMaster('${cat.category}', this.checked)">
+                    </div>
+                </div>`;
             
             cat.groups.forEach(group => {
                 const groupDiv = document.createElement('div');
@@ -518,7 +530,7 @@ window.openDiagnostic = (idx) => {
                 itemsList.style.paddingLeft = '1.2rem';
 
                 group.items.forEach(it => {
-                    const isOk = item.diagnostics[cat.category][it.id] !== false;
+                    const isOk = (item.diagnostics[cat.category] || {})[it.id] === true;
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'diag-item-row';
                     itemDiv.style.display = 'flex';
@@ -548,7 +560,33 @@ window.updateDiagState = (cat, it, val) => {
     if (o && o.inventory[diagnosticIndex]) {
         if (!o.inventory[diagnosticIndex].diagnostics) o.inventory[diagnosticIndex].diagnostics = { hardware:{}, software:{}, notes:'' };
         o.inventory[diagnosticIndex].diagnostics[cat][it] = val;
+
+        // Auto-update master checkbox state
+        const catStruct = DIAG_STRUCTURE.find(c => c.category === cat);
+        if (catStruct) {
+            const allChecked = catStruct.groups.every(g => g.items.every(itemIt => (o.inventory[diagnosticIndex].diagnostics[cat] || {})[itemIt.id] === true));
+            const masterCb = document.getElementById(`master-${cat}`);
+            if (masterCb) masterCb.checked = allChecked;
+        }
     }
+};
+
+window.toggleCategoryMaster = (catName, val) => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    if (!o || !o.inventory[diagnosticIndex]) return;
+    const item = o.inventory[diagnosticIndex];
+    if (!item.diagnostics) item.diagnostics = { hardware: {}, software: {}, notes: '' };
+    if (!item.diagnostics[catName]) item.diagnostics[catName] = {};
+    
+    const catStruct = DIAG_STRUCTURE.find(c => c.category === catName);
+    if (catStruct) {
+        catStruct.groups.forEach(g => {
+            g.items.forEach(it => {
+                item.diagnostics[catName][it.id] = val;
+            });
+        });
+    }
+    openDiagnostic(diagnosticIndex);
 };
 
 window.saveIntegratedDiagnosticFlow = async () => {
@@ -693,52 +731,82 @@ window.exportToPDF = () => {
     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
     const currentLang = localStorage.getItem('pocketITCheckLang') || 'es';
 
-    // 1. Header (Type A for Inventory)
+    // 1. Calculate Stats
+    const total = o.inventory.length;
+    const active = o.inventory.filter(i => i.status === 'Activo').length;
+    const stock = o.inventory.filter(i => i.status === 'Stock').length;
+    const repair = o.inventory.filter(i => i.status === 'Reparación').length;
+    const decom = o.inventory.filter(i => i.status === 'Baja').length;
+
+    const stats = [
+        tPdf(currentLang, 'pdfSummaryBoxTitle'),
+        `${tPdf(currentLang, 'pdfTotal')}: ${total} | ${tPdf(currentLang, 'Activo')}: ${active} | ${tPdf(currentLang, 'Stock')}: ${stock}`,
+        `${tPdf(currentLang, 'Reparación')}: ${repair} | ${tPdf(currentLang, 'Baja')}: ${decom}`
+    ];
+
+    // 2. Header (Type A with Stats)
     const title = tPdf(currentLang, 'pdfInventoryTitle');
     const rightLines = [
-        o.company || '-',
-        `${tPdf(currentLang, 'pdfDate')}: ${o.auditDate || new Date().toLocaleDateString()}`
+        `${tPdf(currentLang, 'pdfDateCol')}: ${o.auditDate || new Date().toISOString().split('T')[0]}`
     ];
-    let y = drawHeaderTypeA(doc, title, [79, 70, 229], rightLines, currentLang);
+    let y = drawHeaderTypeA(doc, title, [5, 150, 105], rightLines, currentLang, stats);
 
-    // 2. Subheader (Office Info)
+    // 3. Subheader (Office Info)
     y = drawSubheader(doc, o, y + 5, currentLang);
 
-    // 3. Inventory Table
-    const tableData = o.inventory.map(item => [
-        item.assetTag || '-',
-        t(currentLang, item.type) || item.type,
-        item.model || '-',
-        item.serial || '-',
-        t(currentLang, item.status) || item.status,
-        item.user || '-'
-    ]);
+    // 4. Inventory Table
+    const tableData = o.inventory.map(item => {
+        const specs = item.specs || {};
+        const parts = [];
+        if (specs.dyn_os) parts.push(`${t(currentLang, 'os')}: ${specs.dyn_os}`);
+        if (specs.dyn_cpu) parts.push(`${t(currentLang, 'cpu')}: ${specs.dyn_cpu}`);
+        if (specs.dyn_ram) parts.push(`${t(currentLang, 'ram')}: ${specs.dyn_ram}`);
+        if (specs.dyn_storage) parts.push(`${t(currentLang, 'storage')}: ${specs.dyn_storage}`);
+        if (specs.dyn_mac) parts.push(`${t(currentLang, 'mac')}: ${specs.dyn_mac}`);
+        if (item.notes) parts.push(`${t(currentLang, 'extraNotes')}: ${item.notes}`);
+        
+        let specStr = parts.join(' | ');
+        if (item.purchaseDate || item.warrantyDate) {
+            specStr += `\n[${t(currentLang, 'purchaseDateLabel')}: ${item.purchaseDate || '-'} - ${t(currentLang, 'warrantyUntilLabel')}: ${item.warrantyDate || '-'}]`;
+        }
+
+        return [
+            item.assetTag || '-',
+            t(currentLang, item.status) || item.status,
+            `${t(currentLang, item.type)}\n${item.model}`,
+            `S/N: ${item.serial || '-'}\nUsu: ${item.user || '-'}`,
+            specStr
+        ];
+    });
 
     doc.autoTable({
         startY: y + 2,
         head: [[
             tPdf(currentLang, 'assetTagLabel'),
-            tPdf(currentLang, 'pdfCategory'),
-            tPdf(currentLang, 'pdfModel'),
-            tPdf(currentLang, 'serialLabel'),
             tPdf(currentLang, 'pdfStatus'),
-            tPdf(currentLang, 'pdfUser')
+            tPdf(currentLang, 'pdfCategory') + ' / ' + tPdf(currentLang, 'pdfModel'),
+            tPdf(currentLang, 'serialLabel') + ' / ' + tPdf(currentLang, 'assignmentLabel'),
+            tPdf(currentLang, 'specsCol')
         ]],
         body: tableData,
         theme: 'grid',
-        headStyles: { fillColor: [79, 70, 229], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+        headStyles: { fillColor: [5, 150, 105], textColor: 255, fontSize: 8, fontStyle: 'bold' },
         bodyStyles: { fontSize: 7, textColor: [30, 41, 59] },
+        columnStyles: {
+            0: { cellWidth: 20 },
+            1: { cellWidth: 20 },
+            2: { cellWidth: 35 },
+            3: { cellWidth: 35 },
+            4: { cellWidth: 'auto' }
+        },
         alternateRowStyles: { fillColor: [248, 250, 252] },
-        margin: { left: 14, right: 14 },
-        didDrawPage: (data) => {
-            // Footers and Page Numbers are added at the end
-        }
+        margin: { left: 14, right: 14 }
     });
 
-    // 4. Signatures
+    // 5. Signatures
     drawModelSignatures(doc, doc.lastAutoTable.finalY + 10, o, currentLang);
 
-    // 5. Page Numbers
+    // 6. Page Numbers
     addModelPageNumbers(doc, currentLang);
 
     doc.save(`Inventory_${o.company}_${new Date().toISOString().split('T')[0]}.pdf`);

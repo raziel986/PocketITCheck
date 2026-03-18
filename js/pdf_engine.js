@@ -15,7 +15,7 @@ export function getStatusColor(status) {
     return [100, 116, 139];
 }
 
-export function drawHeaderTypeA(doc, title, color, rightTextLines, currentLang) {
+export function drawHeaderTypeA(doc, title, color, rightTextLines, currentLang, stats = null) {
     const pw = doc.internal.pageSize.getWidth();
     doc.setFillColor(...color); doc.rect(0, 0, pw, 26, 'F');
     doc.setFillColor(4, 120, 87); doc.rect(0, 26, pw, 1.5, 'F');
@@ -24,15 +24,29 @@ export function drawHeaderTypeA(doc, title, color, rightTextLines, currentLang) 
     doc.text(title, 15, 16);
 
     doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(167, 243, 208);
-    doc.text("PocketITCheck \u2022 v1.0", 15, 22);
+    const dateLine = rightTextLines.find(l => l.includes(':')) || "PocketITCheck \u2022 v1.0";
+    doc.text(dateLine, 15, 22);
 
-    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255);
-    let y = 14;
-    rightTextLines.forEach((line, idx) => {
-        if (idx > 0) { doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(230, 240, 235); }
-        doc.text(line, pw - 15, y, { align: 'right' });
-        y += 6;
-    });
+    if (stats) {
+        const boxW = 85; const boxX = pw - boxW - 15; const boxY = 4;
+        doc.setDrawColor(255, 255, 255); doc.setLineWidth(0.3);
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(boxX, boxY, boxW, 18, 1.5, 1.5, 'FD');
+        
+        doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(51, 65, 85);
+        doc.text(stats[0], boxX + 4, boxY + 6);
+        doc.setFont("helvetica", "normal"); doc.setTextColor(71, 85, 105);
+        doc.text(stats[1], boxX + 4, boxY + 11);
+        if (stats[2]) doc.text(stats[2], boxX + 4, boxY + 15);
+    } else {
+        doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255);
+        let y = 14;
+        rightTextLines.forEach((line, idx) => {
+            if (idx > 0) { doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(230, 240, 235); }
+            doc.text(line, pw - 15, y, { align: 'right' });
+            y += 6;
+        });
+    }
     return 36;
 }
 
