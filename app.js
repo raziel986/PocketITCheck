@@ -793,14 +793,14 @@ window.exportToPDF = () => {
         headStyles: { fillColor: [5, 150, 105], textColor: 255, fontSize: 8, fontStyle: 'bold' },
         bodyStyles: { fontSize: 7, textColor: [30, 41, 59] },
         columnStyles: {
-            0: { cellWidth: 25 },
-            1: { cellWidth: 22 },
-            2: { cellWidth: 45 },
-            3: { cellWidth: 50 },
+            0: { cellWidth: 20 },
+            1: { cellWidth: 18 },
+            2: { cellWidth: 38 },
+            3: { cellWidth: 38 },
             4: { cellWidth: 'auto' }
         },
         alternateRowStyles: { fillColor: [248, 250, 252] },
-        margin: { left: 10, right: 10 }
+        margin: { left: 14, right: 14 }
     });
 
     // 5. Signatures

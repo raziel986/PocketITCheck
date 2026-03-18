@@ -29,9 +29,9 @@ export function drawHeaderTypeA(doc, title, color, rightTextLines, currentLang, 
 
     if (stats) {
         const boxW = 85; const boxX = pw - boxW - 15; const boxY = 4;
-        doc.setDrawColor(255, 255, 255); doc.setLineWidth(0.3);
+        doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.3);
         doc.setFillColor(255, 255, 255);
-        doc.roundedRect(boxX, boxY, boxW, 18, 1.5, 1.5, 'FD');
+        doc.roundedRect(boxX, boxY, boxW, 18, 1, 1, 'FD');
         
         doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(51, 65, 85);
         doc.text(stats[0], boxX + 4, boxY + 6);
@@ -145,7 +145,7 @@ export function addModelPageNumbers(doc, currentLang) {
         doc.setFontSize(7);
         doc.setFont("helvetica", "italic");
         doc.setTextColor(150, 150, 150);
-        doc.text(`${tPdf(currentLang, 'pdfGeneratedBy')} | https://pocketitcheck.app/`, 15, ph - 7);
+        doc.text(`${tPdf(currentLang, 'pdfGeneratedBy')} | https://raziel986.github.io/PocketInventory/`, 15, ph - 7);
         doc.text(`${tPdf(currentLang, 'pdfPage')} ${i}`, pw - 15, ph - 7, { align: 'right' });
     }
 }
