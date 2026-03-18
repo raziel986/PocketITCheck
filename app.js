@@ -646,7 +646,7 @@ window.openMaintenanceResult = (idx) => {
                 group.items.forEach(it => {
                     const isOk = (diagObj[cat.category] || {})[it.id] === true;
                     if (!isOk) {
-                        failedItems.push({ cat: cat.category, id: it.id, label: it.label });
+                        failedItems.push({ cat: cat.category, id: it.id, label: `desc_${it.id}` });
                     }
                 });
             });
@@ -830,7 +830,7 @@ window.generateMasterMaintenancePlanPDF = () => {
                 group.items.forEach(it => {
                     const isOk = (diagObj[cat.category] || {})[it.id] === true;
                     if (!isOk) {
-                        issues.push(`${t(currentLang, it.label)}`);
+                        issues.push(`${t(currentLang, `desc_${it.id}`)}`);
                         actions.push(`${t(currentLang, `act_${it.id}`)}`);
                     }
                 });
