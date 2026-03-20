@@ -1,13 +1,19 @@
-/**
- * app.js - PocketITCheck Entry Point (ESM)
- */
-
-import { initDB, getAllOffices, saveOffice, deleteOffice, migrateFromLocalStorage } from './js/db.js';
 import { applyTranslations, updatePagination, categoryFields } from './js/ui.js';
 import { t, tPdf } from './js/translations.js';
 import { getStatusColor, drawHeaderTypeA, drawHeaderTypeB, drawSubheader, drawModelSignatures, addModelPageNumbers } from './js/pdf_engine.js';
+import { PocketIT_SDK } from '../PocketIT-SDK/src/index.js';
 
 // State
+const sdk = new PocketIT_SDK({
+    dbName: 'PocketITCheckDB',
+    dbVersion: 1
+});
+
+const CHECK_SCHEMA = {
+    offices: { keyPath: 'id' }
+};
+
+let platform;
 let currentLang = localStorage.getItem('pocketITCheckLang') || 'es';
 let appData = [];
 let activeOfficeId = null;
@@ -48,9 +54,13 @@ const DIAG_STRUCTURE = [
 // DOM Cache — populated inside DOMContentLoaded
 let dom = {};
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // 0. Launch Platform
+    platform = await sdk.launch(CHECK_SCHEMA);
+    
     dom = {
         splash: document.getElementById('splash-screen'),
+        // ... (other DOM cache remains same)
         sidebarOffices: document.getElementById('viewCreateOfficeSidebar'),
         sidebarEquip: document.getElementById('viewAddEquipmentSidebar'),
         viewOffices: document.getElementById('viewOfficesTable'),
@@ -87,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 managerTitle: document.getElementById('officeManagerTitle').value.trim(),
                 inventory: editingOfficeId ? (appData.find(o => o.id === editingOfficeId) || { inventory: [] }).inventory : []
             };
-            await saveOffice(newOffice);
+            await platform.storage.save('offices', newOffice);
             if (editingOfficeId) {
                 const idx = appData.findIndex(o => o.id === editingOfficeId);
                 if (idx !== -1) appData[idx] = newOffice;
