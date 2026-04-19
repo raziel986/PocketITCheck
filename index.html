@@ -99,7 +99,9 @@
     <!-- TopAppBar Execution -->
     <header class="top-app-bar">
         <div class="header-left">
-            <button class="material-symbols-outlined menu-btn">menu</button>
+            <div class="header-logo">
+                <img src="img/logo.png" alt="PocketITCheck Logo">
+            </div>
             <h1 class="app-title">Pocket<span class="highlight">IT</span>Check</h1>
         </div>
         <div class="header-right">
@@ -111,9 +113,6 @@
                         <span class="slider-text slider-text-en" id="lang-en">EN</span>
                     </span>
                 </label>
-            </div>
-            <div class="user-avatar">
-                <img src="img/logo.png" alt="PocketITCheck Logo">
             </div>
         </div>
     </header>
@@ -487,17 +486,74 @@
             </div>
         </div>
 
-        <!-- Footer con Creditos y Licencia -->
-        <footer class="app-footer glass-card">
-            <div class="credits-info">
-                Desarrollado por <strong>Carlos Noguera</strong> <br>
-                Contacto: <a href="mailto:cnoguera.dev@gmail.com">cnoguera.dev@gmail.com</a>
+        <!-- VISTA: Settings / Configuración -->
+        <div id="viewSettings" style="display: none;">
+            <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="color: var(--primary);">settings</span>
+                <span data-i18n="settingsTitle">Configuración</span>
+            </h2>
+
+            <!-- Data Management -->
+            <div class="settings-group">
+                <h3 class="settings-group-title">
+                    <span class="material-symbols-outlined">database</span>
+                    <span data-i18n="settingsDataTitle">Gestión de Datos</span>
+                </h3>
+                <div class="settings-item" onclick="exportAllData()">
+                    <div class="settings-item-left">
+                        <span class="material-symbols-outlined">download</span>
+                        <div>
+                            <div class="settings-item-label" data-i18n="settingsExport">Exportar Todos los Datos</div>
+                            <div class="settings-item-desc" data-i18n="settingsExportDesc">Descarga un backup JSON completo</div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--outline);">chevron_right</span>
+                </div>
+                <div class="settings-item" onclick="importAllData()">
+                    <div class="settings-item-left">
+                        <span class="material-symbols-outlined">upload</span>
+                        <div>
+                            <div class="settings-item-label" data-i18n="settingsImport">Importar Datos</div>
+                            <div class="settings-item-desc" data-i18n="settingsImportDesc">Restaurar desde un archivo JSON</div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--outline);">chevron_right</span>
+                </div>
+                <div class="settings-item settings-item-danger" onclick="clearAllData()">
+                    <div class="settings-item-left">
+                        <span class="material-symbols-outlined">delete_forever</span>
+                        <div>
+                            <div class="settings-item-label" data-i18n="settingsClear">Borrar Todos los Datos</div>
+                            <div class="settings-item-desc" data-i18n="settingsClearDesc">Elimina permanentemente todo el inventario</div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--error);">chevron_right</span>
+                </div>
             </div>
-            <div class="license-info">
-                <span>Esta obra y codigo fuente estan bajo una <br> <a rel="license" href="LICENSE"
-                        target="_blank">Licencia MIT</a>.</span>
+
+            <!-- About -->
+            <div class="settings-group">
+                <h3 class="settings-group-title">
+                    <span class="material-symbols-outlined">info</span>
+                    <span data-i18n="settingsAboutTitle">Acerca de</span>
+                </h3>
+                <div class="settings-about">
+                    <div class="settings-about-logo">
+                        <img src="img/logo.png" alt="Logo">
+                    </div>
+                    <div class="settings-about-name">PocketITCheck</div>
+                    <div class="settings-about-version">v1.0.0 — PWA Offline</div>
+                    <div class="settings-about-desc" data-i18n="appSlogan">Inventario | Diagnostico | Mantenimiento | Reparaciones</div>
+                    <div class="settings-about-credits">
+                        <span data-i18n="settingsDeveloper">Desarrollado por</span> <strong>Carlos Noguera</strong><br>
+                        <a href="mailto:cnoguera.dev@gmail.com">cnoguera.dev@gmail.com</a>
+                    </div>
+                    <div class="settings-about-license">
+                        <a rel="license" href="LICENSE" target="_blank" data-i18n="settingsLicense">Licencia MIT</a>
+                    </div>
+                </div>
             </div>
-        </footer>
+        </div>
         </div>
     </main>
 
@@ -511,7 +567,7 @@
             <span class="material-symbols-outlined">add_circle</span>
             <span class="nav-label" data-i18n="newOffice">Nueva Oficina</span>
         </a>
-        <a class="nav-item" href="#">
+        <a class="nav-item" href="#" onclick="showSettings(); return false;">
             <span class="material-symbols-outlined">settings</span>
             <span class="nav-label" data-i18n="settingsLabel">Settings</span>
         </a>

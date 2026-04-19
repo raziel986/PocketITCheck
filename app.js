@@ -66,7 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         cancelEditBtn: document.getElementById('cancelEditBtn'),
         countBadge: document.getElementById('itemCount'),
         officeCountBadge: document.getElementById('officeCountBadge'),
-        mainFAB: document.getElementById('mainFAB')
+        mainFAB: document.getElementById('mainFAB'),
+        viewSettings: document.getElementById('viewSettings')
     };
 
     // Office form submit
@@ -210,11 +211,10 @@ window.selectOffice = (id) => {
     const o = appData.find(o => o.id === id);
     if (!o) return;
     activeOfficeId = id;
-    // All sections hidden by default, only show inventory table
-    dom.sidebarOffices.style.display = 'none';
-    dom.viewOffices.style.display = 'none';
-    dom.sidebarEquip.style.display = 'none';
+    hideAllViews();
     dom.viewEquip.style.display = 'block';
+    if (dom.mainFAB) dom.mainFAB.style.display = 'flex';
+    setActiveNav(0);
     updateOfficeSummaryUI(o);
     renderTable();
 };
@@ -253,12 +253,30 @@ window.hideAddEquipmentForm = () => {
     dom.viewEquip.style.display = 'block';
 };
 
-window.goBackToOffices = () => {
-    activeOfficeId = null;
+function hideAllViews() {
     dom.sidebarOffices.style.display = 'none';
-    dom.viewOffices.style.display = 'block';
+    dom.viewOffices.style.display = 'none';
     dom.sidebarEquip.style.display = 'none';
     dom.viewEquip.style.display = 'none';
+    if (dom.viewSettings) dom.viewSettings.style.display = 'none';
+    const diagSection = document.getElementById('diag-integrated-section');
+    if (diagSection) diagSection.style.display = 'none';
+    const resultSection = document.getElementById('result-integrated-section');
+    if (resultSection) resultSection.style.display = 'none';
+}
+
+function setActiveNav(index) {
+    document.querySelectorAll('.bottom-nav .nav-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+    });
+}
+
+window.goBackToOffices = () => {
+    activeOfficeId = null;
+    hideAllViews();
+    dom.viewOffices.style.display = 'block';
+    if (dom.mainFAB) dom.mainFAB.style.display = 'flex';
+    setActiveNav(0);
     renderOfficesTable();
 };
 
@@ -266,8 +284,10 @@ window.showAddOfficeForm = () => {
     editingOfficeId = null;
     dom.officeForm.reset();
     document.getElementById('officeCompany').focus();
-    dom.viewOffices.style.display = 'none';
+    hideAllViews();
     dom.sidebarOffices.style.display = 'block';
+    if (dom.mainFAB) dom.mainFAB.style.display = 'flex';
+    setActiveNav(1);
 };
 
 window.hideAddOfficeForm = () => {
@@ -1163,4 +1183,93 @@ window.generateResultsReportPDF = () => {
     doc.save(`MaintenanceReport_${o.company}_${new Date().toISOString().split('T')[0]}.pdf`);
 };
 
+// ====== Settings & Data Management ======
+window.showSettings = () => {
+    activeOfficeId = null;
+    hideAllViews();
+    if (dom.viewSettings) dom.viewSettings.style.display = 'block';
+    if (dom.mainFAB) dom.mainFAB.style.display = 'none';
+    setActiveNav(2);
+    applyTranslations(currentLang);
+};
 
+window.exportAllData = async () => {
+    try {
+        const data = await getAllOffices();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `PocketITCheck_Backup_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        Swal.fire({ title: t(currentLang, 'successMsg'), text: t(currentLang, 'settingsExportOk'), icon: 'success', timer: 1500, showConfirmButton: false });
+    } catch (err) {
+        console.error('Export error:', err);
+        Swal.fire({ title: 'Error', text: err.message, icon: 'error' });
+    }
+};
+
+window.importAllData = () => {
+    let fileInput = document.getElementById('importFileInput');
+    if (!fileInput) {
+        fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.id = 'importFileInput';
+        fileInput.accept = '.json';
+        fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+    }
+    fileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (!Array.isArray(data)) throw new Error('Invalid format');
+            const confirm = await Swal.fire({
+                title: t(currentLang, 'sureConfirm'),
+                text: t(currentLang, 'settingsImportWarn'),
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3525cd',
+                confirmButtonText: t(currentLang, 'settingsImportConfirm')
+            });
+            if (confirm.isConfirmed) {
+                for (const office of data) {
+                    await saveOffice(office);
+                }
+                appData = await getAllOffices();
+                renderOfficesTable();
+                Swal.fire({ title: t(currentLang, 'successMsg'), text: `${data.length} ${t(currentLang, 'settingsImportOk')}`, icon: 'success', timer: 2000, showConfirmButton: false });
+            }
+        } catch (err) {
+            console.error('Import error:', err);
+            Swal.fire({ title: 'Error', text: t(currentLang, 'settingsImportError'), icon: 'error' });
+        }
+        fileInput.value = '';
+    };
+    fileInput.click();
+};
+
+window.clearAllData = async () => {
+    const confirm = await Swal.fire({
+        title: t(currentLang, 'sureConfirm'),
+        text: t(currentLang, 'settingsClearWarn'),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: t(currentLang, 'deleteBtn')
+    });
+    if (confirm.isConfirmed) {
+        for (const office of appData) {
+            await deleteOffice(office.id);
+        }
+        appData = [];
+        activeOfficeId = null;
+        window.goBackToOffices();
+        Swal.fire({ title: t(currentLang, 'deletedMsg'), icon: 'success', timer: 1500, showConfirmButton: false });
+    }
+};

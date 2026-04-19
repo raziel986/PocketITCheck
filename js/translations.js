@@ -291,7 +291,25 @@ export const translations = {
         pdfColStatus: "Estado",
         pdfColCatMod: "Categoria / Modelo",
         pdfColSNAsig: "S/N / Asignacion",
-        pdfColSpecs: "Especificaciones"
+        pdfColSpecs: "Especificaciones",
+        // Settings
+        settingsTitle: "Configuracion",
+        settingsDataTitle: "Gestion de Datos",
+        settingsExport: "Exportar Todos los Datos",
+        settingsExportDesc: "Descarga un backup JSON completo",
+        settingsExportOk: "Backup exportado correctamente.",
+        settingsImport: "Importar Datos",
+        settingsImportDesc: "Restaurar desde un archivo JSON",
+        settingsImportWarn: "Esto agregara o reemplazara las oficinas existentes.",
+        settingsImportConfirm: "Si, importar",
+        settingsImportOk: "oficinas importadas correctamente.",
+        settingsImportError: "El archivo no tiene un formato valido.",
+        settingsClear: "Borrar Todos los Datos",
+        settingsClearDesc: "Elimina permanentemente todo el inventario",
+        settingsClearWarn: "Esta accion eliminara TODOS los datos. No se puede deshacer.",
+        settingsAboutTitle: "Acerca de",
+        settingsDeveloper: "Desarrollado por",
+        settingsLicense: "Licencia MIT"
     },
     en: {
         appName: "PocketITCheck",
@@ -581,7 +599,25 @@ export const translations = {
         pdfColStatus: "Status",
         pdfColCatMod: "Category / Model",
         pdfColSNAsig: "S/N / Assignment",
-        pdfColSpecs: "Specifications"
+        pdfColSpecs: "Specifications",
+        // Settings
+        settingsTitle: "Settings",
+        settingsDataTitle: "Data Management",
+        settingsExport: "Export All Data",
+        settingsExportDesc: "Download a full JSON backup",
+        settingsExportOk: "Backup exported successfully.",
+        settingsImport: "Import Data",
+        settingsImportDesc: "Restore from a JSON file",
+        settingsImportWarn: "This will add or replace existing offices.",
+        settingsImportConfirm: "Yes, import",
+        settingsImportOk: "offices imported successfully.",
+        settingsImportError: "The file format is not valid.",
+        settingsClear: "Delete All Data",
+        settingsClearDesc: "Permanently delete all inventory",
+        settingsClearWarn: "This action will delete ALL data. It cannot be undone.",
+        settingsAboutTitle: "About",
+        settingsDeveloper: "Developed by",
+        settingsLicense: "MIT License"
     }
 };
 
