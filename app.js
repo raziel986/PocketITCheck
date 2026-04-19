@@ -5,6 +5,7 @@ import { getAllOffices, saveOffice, deleteOffice, migrateFromLocalStorage } from
 
 // State
 let currentLang = localStorage.getItem('pocketITCheckLang') || 'es';
+if (!localStorage.getItem('pocketITCheckLang')) localStorage.setItem('pocketITCheckLang', 'es');
 let appData = [];
 let activeOfficeId = null;
 let editingIndex = -1;
@@ -316,9 +317,8 @@ function updateOfficeSummaryUI(o) {
         </div>`;
 }
 
-// Offices Rendering
+// Offices Rendering — Accordion Style
 function renderOfficesTable() {
-    // Robust selection of list container
     let listContainer = document.getElementById('officesListContainer');
     if (!listContainer) {
         const viewOffices = document.getElementById('viewOfficesTable');
@@ -348,74 +348,79 @@ function renderOfficesTable() {
     if (dom.officeCountBadge) dom.officeCountBadge.textContent = `${appData.length} ${t(currentLang, 'officesCount')}`;
 
     if (filtered.length === 0) {
-        listContainer.innerHTML = `<div class="glass-card" style="text-align:center; padding: 4rem 2rem;">
+        listContainer.innerHTML = `<div style="text-align:center; padding: 3rem 1rem;">
             <div style="font-size: 3rem; margin-bottom: 1rem;">🏢</div>
             <h3 style="margin-bottom:0.5rem;">${t(currentLang, 'emptyOffices')}</h3>
             <p style="color:var(--outline);">${t(currentLang, 'noResults')}</p>
         </div>`;
     } else {
-        const grid = document.createElement('div');
-        grid.className = 'grid-container';
-        grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;';
-        listContainer.appendChild(grid);
+        const list = document.createElement('div');
+        list.className = 'accordion-list';
+        listContainer.appendChild(list);
         
         const start = (state.currentPage - 1) * state.itemsPerPage;
         const paged = state.itemsPerPage === Infinity ? filtered : filtered.slice(start, start + state.itemsPerPage);
         
         paged.forEach(office => {
             const card = document.createElement('div');
-            card.className = 'glass-card office-card';
+            card.className = 'accordion-card';
+            const equipCount = (office.inventory || []).length;
             card.innerHTML = `
-                <div class="office-info">
-                    <div class="office-icon">
-                        <span class="material-symbols-outlined">business</span>
-                    </div>
-                    <div class="office-details">
-                        <h3>${office.company}</h3>
-                        <div style="font-size: 0.85rem; color: var(--on-surface-variant); font-weight:500;">
-                            ${t(currentLang, 'deptLabel')}: <b style="color:var(--primary); font-weight:700;">${office.depto}</b>
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-header-left">
+                        <div class="accordion-icon"><span class="material-symbols-outlined">business</span></div>
+                        <div class="accordion-summary">
+                            <div class="accordion-title">${office.company}</div>
+                            <div class="accordion-subtitle">${office.depto} · <strong>${equipCount}</strong> ${t(currentLang, 'equips')}</div>
                         </div>
                     </div>
+                    <span class="material-symbols-outlined accordion-chevron">expand_more</span>
                 </div>
-                <div class="office-meta">
-                    <div class="meta-item">
-                        <span class="material-symbols-outlined">location_on</span>
-                        <span>${office.location}</span>
+                <div class="accordion-body">
+                    <div class="accordion-details">
+                        <div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">location_on</span>
+                            <span>${office.location}</span>
+                        </div>
+                        <div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">person_check</span>
+                            <span>${t(currentLang, 'techAuditor')}: <b>${office.auditor}</b></span>
+                        </div>
+                        <div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">badge</span>
+                            <span>${t(currentLang, 'managerLabel')}: <b>${office.manager || '-'}</b> — <em>${office.managerTitle || ''}</em></span>
+                        </div>
+                        <div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">calendar_today</span>
+                            <span>${t(currentLang, 'auditDateLabel')}: <b>${office.auditDate || '-'}</b></span>
+                        </div>
                     </div>
-                    <div class="meta-item">
-                        <span class="material-symbols-outlined">person_check</span>
-                        <span>Auditor: ${office.auditor}</span>
+                    <div class="accordion-actions">
+                        <button class="btn btn-primary btn-sm" onclick="selectOffice('${office.id}')" style="flex:1;">
+                            <span class="material-symbols-outlined">visibility</span> ${t(currentLang, 'equips')}
+                        </button>
+                        <button class="equip-action-btn act-edit" onclick="editOffice('${office.id}')">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                        <button class="equip-action-btn act-delete" onclick="deleteOfficeHandler('${office.id}')">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
                     </div>
-                </div>
-                <div class="office-stats">
-                    <div class="stat-badge">
-                        <span class="stat-value">${(office.inventory || []).length}</span>
-                        <span class="stat-label">${t(currentLang, 'equips')}</span>
-                    </div>
-                    <div class="stat-date">
-                        <span class="material-symbols-outlined">calendar_today</span>
-                        <span>${office.auditDate}</span>
-                    </div>
-                </div>
-                <div class="office-actions" style="display: flex; gap: 0.5rem; margin-top: 1.25rem;">
-                    <button class="btn btn-primary btn-sm" onclick="selectOffice('${office.id}')" style="flex:1;">
-                        <span class="material-symbols-outlined">visibility</span> Ver
-                    </button>
-                    <button class="icon-btn-circle" onclick="editOffice('${office.id}')">
-                        <span class="material-symbols-outlined">edit</span>
-                    </button>
-                    <button class="icon-btn-circle btn-danger" onclick="deleteOfficeHandler('${office.id}')">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
                 </div>
             `;
-            grid.appendChild(card);
+            list.appendChild(card);
         });
 
         const state_o = tableState.offices;
         updatePagination('offices', filtered.length, 'officePagination', state_o, currentLang, (p) => { state_o.currentPage = p; renderOfficesTable(); });
     }
 }
+
+window.toggleAccordion = (headerEl) => {
+    const card = headerEl.closest('.accordion-card');
+    if (!card) return;
+    card.classList.toggle('open');
+};
 
 window.editOffice = (id) => {
     const o = appData.find(o => o.id === id);
@@ -448,10 +453,20 @@ window.deleteOfficeHandler = async (id) => {
     }
 };
 
-// Equipment rendering
 function renderTable() {
-    if (!dom.equipTbody) return;
-    dom.equipTbody.innerHTML = '';
+    // Use accordion container instead of table tbody
+    let container = document.getElementById('equipAccordionList');
+    const tableEl = document.getElementById('inventoryTable');
+    if (tableEl) tableEl.style.display = 'none';
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'equipAccordionList';
+        container.className = 'accordion-list';
+        const tableCont = document.querySelector('#viewInventoryTable .table-container');
+        if (tableCont) tableCont.appendChild(container);
+    }
+    container.innerHTML = '';
+
     const o = appData.find(off => off.id === activeOfficeId);
     if (!o) return;
     const state = tableState.equipment;
@@ -466,43 +481,69 @@ function renderTable() {
     if (dom.countBadge) dom.countBadge.textContent = `${o.inventory.length} ${t(currentLang, 'equipmentCount')}`;
 
     if (filtered.length === 0) {
-        dom.equipTbody.innerHTML = `<tr><td colspan="5" class="empty-state">📭 ${t(currentLang, q ? 'noResults' : 'emptyAssets')}</td></tr>`;
+        container.innerHTML = `<div class="empty-state">📭 ${t(currentLang, q ? 'noResults' : 'emptyAssets')}</div>`;
     } else {
         const start = (state.currentPage - 1) * state.itemsPerPage;
         const paged = state.itemsPerPage === Infinity ? filtered : filtered.slice(start, start + state.itemsPerPage);
         paged.forEach(item => {
             const hasDiag = item.diagnostics ? Object.values({...item.diagnostics.hardware,...item.diagnostics.software}).some(v => v === false) : false;
             const hasMaint = !!item.maintenanceResult;
-            const statusColor = statusColorMap[item.status] || '#64748b';
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td data-label="${t(currentLang,'assetTagLabel')}"><span class="section-label" style="background:var(--primary-container); color:var(--on-primary-container);">${item.assetTag}</span></td>
-                <td data-label="${t(currentLang,'infoGeneral')}">
-                    <div style="font-family:var(--font-headline); font-weight:700; color:var(--primary);">${t(currentLang, item.type)}</div>
-                    <div style="font-weight:600; font-size:0.9rem;">${item.model}</div>
-                    ${item.specs ? `<div style="font-size:0.75rem; color:var(--outline); margin-top:4px; display:flex; flex-wrap:wrap; gap:8px;">
-                        ${Object.entries(item.specs).filter(([k,v]) => v).map(([k,v]) => `<span>• ${v}</span>`).join('')}
-                    </div>` : ''}
-                </td>
-                <td data-label="${t(currentLang,'statusAssignment')}">
-                    <span class="badge-status status-${item.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}">${t(currentLang, item.status)}</span><br/>
-                    <div style="font-size:0.85rem; color:var(--outline); margin-top:4px;">
-                        <span class="material-symbols-outlined" style="font-size:0.9rem; vertical-align:middle;">person</span> ${item.user}
+            const statusNorm = item.status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const specsHtml = item.specs ? Object.entries(item.specs).filter(([k,v]) => v).map(([k,v]) => `
+                <div class="accordion-detail-row">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">settings</span>
+                    <span><b>${t(currentLang, k)}</b>: ${v}</span>
+                </div>`).join('') : '';
+            
+            const card = document.createElement('div');
+            card.className = 'accordion-card';
+            card.innerHTML = `
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-header-left">
+                        <div class="accordion-icon equip-type"><span class="material-symbols-outlined">devices</span></div>
+                        <div class="accordion-summary">
+                            <div class="accordion-title">${item.assetTag}</div>
+                            <div class="accordion-subtitle">${t(currentLang, item.type)} · ${item.model}</div>
+                        </div>
                     </div>
-                </td>
-                <td data-label="${t(currentLang,'techSpecs')}">
-                    <div style="font-size:0.85rem;"><span style="color:var(--outline);">S/N:</span> <b>${item.serial || '-'}</b></div>
-                    ${item.purchaseDate ? `<div style="font-size:0.75rem; color:var(--outline); margin-top:2px;">📅 ${item.purchaseDate}</div>` : ''}
-                </td>
-                <td data-label="${t(currentLang,'actionsLabel')}" class="action-col">
-                    <div style="display:flex; gap:0.35rem;">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <span class="badge-status status-${statusNorm}">${t(currentLang, item.status)}</span>
+                        <span class="material-symbols-outlined accordion-chevron">expand_more</span>
+                    </div>
+                </div>
+                <div class="accordion-body">
+                    <div class="accordion-details">
+                        <div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">person</span>
+                            <span>${t(currentLang, 'assignmentLabel')}: <b>${item.user || '-'}</b></span>
+                        </div>
+                        <div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">tag</span>
+                            <span>S/N: <b>${item.serial || '-'}</b></span>
+                        </div>
+                        ${item.purchaseDate ? `<div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">shopping_cart</span>
+                            <span>${t(currentLang, 'purchaseDateLabel')}: <b>${item.purchaseDate}</b></span>
+                        </div>` : ''}
+                        ${item.warrantyDate ? `<div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">verified_user</span>
+                            <span>${t(currentLang, 'warrantyUntilLabel')}: <b>${item.warrantyDate}</b></span>
+                        </div>` : ''}
+                        ${specsHtml}
+                        ${item.notes ? `<div class="accordion-detail-row" style="margin-top:0.25rem;">
+                            <span class="material-symbols-outlined">notes</span>
+                            <span style="color:var(--outline); font-style:italic;">${item.notes}</span>
+                        </div>` : ''}
+                    </div>
+                    <div class="accordion-actions">
                         <button class="equip-action-btn act-edit" onclick="editEquipment(${item.originalIndex})" title="${t(currentLang,'editEquipment')}"><span class="material-symbols-outlined">edit</span></button>
                         <button class="equip-action-btn act-diag" onclick="openDiagnostic(${item.originalIndex})" title="${t(currentLang,'integratedDiag')}"><span class="material-symbols-outlined">biotech</span></button>
                         <button class="equip-action-btn act-maint${hasMaint ? ' done' : ''}" onclick="openMaintenanceResult(${item.originalIndex})" title="${t(currentLang,'maintResult')}"><span class="material-symbols-outlined">${hasMaint ? 'task_alt' : 'build'}</span></button>
                         <button class="equip-action-btn act-delete" onclick="deleteItem(${item.originalIndex})" title="${t(currentLang,'deleteBtn')}"><span class="material-symbols-outlined">delete</span></button>
                     </div>
-                </td>`;
-            dom.equipTbody.appendChild(tr);
+                </div>
+            `;
+            container.appendChild(card);
         });
         updatePagination('equipment', filtered.length, 'equipmentPagination', state, currentLang, (p) => { state.currentPage = p; renderTable(); });
     }
