@@ -495,11 +495,11 @@ function renderTable() {
                     ${item.purchaseDate ? `<div style="font-size:0.75rem; color:var(--outline); margin-top:2px;">📅 ${item.purchaseDate}</div>` : ''}
                 </td>
                 <td data-label="${t(currentLang,'actionsLabel')}" class="action-col">
-                    <div style="display:flex; gap:0.25rem;">
-                        <button class="menu-btn" onclick="editEquipment(${item.originalIndex})" title="${t(currentLang,'editEquipment')}"><span class="material-symbols-outlined">edit</span></button>
-                        <button class="menu-btn" onclick="openDiagnostic(${item.originalIndex})" title="${t(currentLang,'integratedDiag')}" style="color:var(--primary);"><span class="material-symbols-outlined">biotech</span></button>
-                        <button class="menu-btn" onclick="openMaintenanceResult(${item.originalIndex})" title="${t(currentLang,'maintResult')}" style="color:${hasMaint ? '#10b981' : '#f59e0b'};"><span class="material-symbols-outlined">${hasMaint ? 'task_alt' : 'tools_wrench'}</span></button>
-                        <button class="menu-btn" onclick="deleteItem(${item.originalIndex})" title="${t(currentLang,'deleteBtn')}" style="color:var(--error);"><span class="material-symbols-outlined">delete</span></button>
+                    <div style="display:flex; gap:0.35rem;">
+                        <button class="equip-action-btn act-edit" onclick="editEquipment(${item.originalIndex})" title="${t(currentLang,'editEquipment')}"><span class="material-symbols-outlined">edit</span></button>
+                        <button class="equip-action-btn act-diag" onclick="openDiagnostic(${item.originalIndex})" title="${t(currentLang,'integratedDiag')}"><span class="material-symbols-outlined">biotech</span></button>
+                        <button class="equip-action-btn act-maint${hasMaint ? ' done' : ''}" onclick="openMaintenanceResult(${item.originalIndex})" title="${t(currentLang,'maintResult')}"><span class="material-symbols-outlined">${hasMaint ? 'task_alt' : 'build'}</span></button>
+                        <button class="equip-action-btn act-delete" onclick="deleteItem(${item.originalIndex})" title="${t(currentLang,'deleteBtn')}"><span class="material-symbols-outlined">delete</span></button>
                     </div>
                 </td>`;
             dom.equipTbody.appendChild(tr);

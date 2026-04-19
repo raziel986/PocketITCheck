@@ -721,6 +721,170 @@ input:checked + .slider:before {
     color: var(--outline);
 }
 
+/* ====== Inventory View Header ====== */
+.inv-header {
+    margin-bottom: 1rem;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--outline-variant);
+    border-radius: 10px;
+    background: var(--surface-container-low);
+    color: var(--on-surface-variant);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0.75rem;
+}
+
+.btn-back .material-symbols-outlined {
+    font-size: 1.1rem;
+}
+
+.btn-back:hover {
+    background: var(--surface-container-high);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.inv-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.inv-title-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* ====== Report Toolbar ====== */
+.report-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.6rem;
+    background: var(--surface-container-low);
+    border-radius: 14px;
+    border: 1px solid var(--surface-container-high);
+    overflow-x: auto;
+}
+
+.report-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 10px;
+    background: var(--surface-container-lowest);
+    color: var(--on-surface-variant);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex: 1;
+    justify-content: center;
+    border: 1px solid transparent;
+}
+
+.report-btn .material-symbols-outlined {
+    font-size: 1.15rem;
+    color: var(--primary);
+}
+
+.report-btn:hover {
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    border-color: var(--primary-container);
+}
+
+.report-btn:active {
+    transform: scale(0.97);
+}
+
+.report-btn-label {
+    pointer-events: none;
+}
+
+/* ====== Equipment Card (Mobile Table Rows) ====== */
+@media (max-width: 600px) {
+    #tableBody tr {
+        border: 1px solid var(--outline-variant);
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+        background: var(--surface-container-lowest);
+        box-shadow: var(--shadow-ambient);
+    }
+
+    #tableBody tr td {
+        border-bottom: 1px solid var(--surface-container-high);
+    }
+
+    #tableBody tr td:last-child {
+        border-bottom: none;
+    }
+
+    /* Action buttons row: centered and spaced */
+    #tableBody tr td.action-col {
+        display: flex;
+        justify-content: center;
+        padding: 0.6rem 0.75rem;
+        background: var(--surface-container-low);
+    }
+
+    #tableBody tr td.action-col > div {
+        gap: 0.5rem !important;
+    }
+}
+
+/* Equipment action buttons - cleaner */
+.equip-action-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 10px;
+    background: var(--surface-container-high);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.equip-action-btn .material-symbols-outlined {
+    font-size: 1.15rem;
+}
+
+.equip-action-btn:hover {
+    transform: scale(1.08);
+}
+
+.equip-action-btn.act-edit { color: var(--on-surface-variant); }
+.equip-action-btn.act-edit:hover { background: var(--primary-container); color: var(--primary); }
+.equip-action-btn.act-diag { color: var(--primary); }
+.equip-action-btn.act-diag:hover { background: var(--primary-container); }
+.equip-action-btn.act-maint { color: #f59e0b; }
+.equip-action-btn.act-maint.done { color: #10b981; }
+.equip-action-btn.act-maint:hover { background: #fef3c7; }
+.equip-action-btn.act-maint.done:hover { background: #dcfce7; }
+.equip-action-btn.act-delete { color: var(--error); }
+.equip-action-btn.act-delete:hover { background: var(--error-container); }
+
 /* Diagnostic Card */
 .diag-card {
     background: var(--surface-container-lowest);
