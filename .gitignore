@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build and logs
+dist/
+build/
+*.log
+*.tmp
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Sensitive files
+.env
+.env.local
+*.pem
+.ssh/
+
+# Local configuration
+.claude/settings.local.json
