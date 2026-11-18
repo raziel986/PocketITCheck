@@ -87,7 +87,8 @@ export function drawSubheader(doc, o, startY, currentLang) {
         doc.text(labelText, x, y);
         const w = doc.getTextWidth(labelText);
         doc.setFont("helvetica", "normal"); doc.setTextColor(15, 23, 42);
-        doc.text(value || '-', x + w + 1, y);
+        const splitValue = doc.splitTextToSize(value || '-', pw - x - w - 10);
+        doc.text(splitValue, x + w + 1, y);
     };
 
     drawLine('pdfCompany', o.company, 18, startY + 1);

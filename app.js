@@ -1,4 +1,4 @@
-import { applyTranslations, updatePagination, categoryFields, collectSystemInfo } from './js/ui.js';
+import { applyTranslations, updatePagination, categoryFields, collectSystemInfo, checkProceduralIntegrity, showFinalChecklist } from './js/ui.js';
 import { t, tPdf } from './js/translations.js';
 import { getStatusColor, drawHeaderTypeA, drawHeaderTypeB, drawSubheader, drawModelSignatures, addModelPageNumbers } from './js/pdf_engine.js';
 import { getAllOffices, saveOffice, deleteOffice, migrateFromLocalStorage } from './js/db.js';
@@ -23,20 +23,84 @@ const DIAG_STRUCTURE = [
     {
         category: 'hardware',
         groups: [
-            { key: 'power', items: [{ id: 'cables', label: 'cables', desc: 'desc_cable' }, { id: 'battery', label: 'battery', desc: 'desc_bat' }] },
-            { key: 'storage', items: [{ id: 'smart', label: 'smart', desc: 'desc_smart' }, { id: 'speed', label: 'speed', desc: 'desc_speed' }] },
-            { key: 'ram', items: [{ id: 'test', label: 'test', desc: 'desc_test' }, { id: 'clean_ram', label: 'clean_ram', desc: 'desc_clean_ram' }] },
-            { key: 'temp', items: [{ id: 'paste', label: 'thermalPaste', desc: 'desc_paste' }, { id: 'fan', label: 'fans', desc: 'desc_fan' }] },
-            { key: 'clean', items: [{ id: 'int', label: 'internal', desc: 'desc_int' }, { id: 'ext', label: 'external', desc: 'desc_ext' }] }
+            {
+                key: 'power',
+                items: [
+                    { id: 'cables', label: 'cables', desc: 'desc_cable' },
+                    { id: 'battery', label: 'battery', desc: 'desc_bat' },
+                    { id: 'psu_volt', label: 'psu_volt', desc: 'desc_psu_volt' }
+                ]
+            },
+            {
+                key: 'storage',
+                items: [
+                    { id: 'smart', label: 'smart', desc: 'desc_smart' },
+                    { id: 'speed', label: 'speed', desc: 'desc_speed' },
+                    { id: 'bad_sectors', label: 'bad_sectors', desc: 'desc_bad_sectors' },
+                    { id: 'nvme_tbw', label: 'nvme_tbw', desc: 'desc_nvme_tbw' }
+                ]
+            },
+            {
+                key: 'ram',
+                items: [
+                    { id: 'test', label: 'test', desc: 'desc_test' },
+                    { id: 'clean_ram', label: 'clean_ram', desc: 'desc_clean_ram' },
+                    { id: 'memtest_err', label: 'memtest_err', desc: 'desc_memtest_err' }
+                ]
+            },
+            {
+                key: 'temp',
+                items: [
+                    { id: 'paste', label: 'thermalPaste', desc: 'desc_paste' },
+                    { id: 'fan', label: 'fans', desc: 'desc_fan' },
+                    { id: 'thermal_throttling', label: 'thermal_throttling', desc: 'desc_thermal_throttling' }
+                ]
+            },
+            {
+                key: 'clean',
+                items: [
+                    { id: 'int', label: 'internal', desc: 'desc_int' },
+                    { id: 'ext', label: 'external', desc: 'desc_ext' },
+                    { id: 'ports_clean', label: 'ports_clean', desc: 'desc_ports_clean' }
+                ]
+            }
         ]
     },
     {
         category: 'software',
         groups: [
-            { key: 'os', items: [{ id: 'upd', label: 'updates', desc: 'desc_upd' }, { id: 'sfc', label: 'integrity', desc: 'desc_sfc' }] },
-            { key: 'security', items: [{ id: 'av', label: 'av', desc: 'desc_av' }, { id: 'fw', label: 'fw', desc: 'desc_fw' }] },
-            { key: 'performance', items: [{ id: 'drv', label: 'drv', desc: 'desc_drv' }, { id: 'bg', label: 'bg', desc: 'desc_bg' }] },
-            { key: 'license', items: [{ id: 'win', label: 'win', desc: 'desc_win' }, { id: 'off', label: 'off', desc: 'desc_off' }] }
+            {
+                key: 'os',
+                items: [
+                    { id: 'upd', label: 'updates', desc: 'desc_upd' },
+                    { id: 'sfc', label: 'integrity', desc: 'desc_sfc' },
+                    { id: 'bsod_log', label: 'bsod_log', desc: 'desc_bsod_log' }
+                ]
+            },
+            {
+                key: 'security',
+                items: [
+                    { id: 'av', label: 'av', desc: 'desc_av' },
+                    { id: 'fw', label: 'fw', desc: 'desc_fw' },
+                    { id: 'malware_scan', label: 'malware_scan', desc: 'desc_malware_scan' }
+                ]
+            },
+            {
+                key: 'performance',
+                items: [
+                    { id: 'drv', label: 'drv', desc: 'desc_drv' },
+                    { id: 'bg', label: 'bg', desc: 'desc_bg' },
+                    { id: 'startup_impact', label: 'startup_impact', desc: 'desc_startup_impact' }
+                ]
+            },
+            {
+                key: 'license',
+                items: [
+                    { id: 'win', label: 'win', desc: 'desc_win' },
+                    { id: 'off', label: 'off', desc: 'desc_off' },
+                    { id: 'tpm_secureboot', label: 'tpm_secureboot', desc: 'desc_tpm_secureboot' }
+                ]
+            }
         ]
     }
 ];
@@ -1329,89 +1393,120 @@ window.exportToPDF = () => {
     const o = appData.find(off => off.id === activeOfficeId);
     if (!o || o.inventory.length === 0) return;
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'l', unit: 'mm', format: 'a4' });
-    const currentLang = localStorage.getItem('pocketITCheckLang') || 'es';
+    // 1. Procedural Integrity Check (New)
+    let allIssues = [];
+    o.inventory.forEach(item => {
+        const issues = checkProceduralIntegrity(item);
+        if (issues.length > 0) allIssues.push(`${item.assetTag}: ${issues.join(', ')}`);
+    });
 
-    // 1. Calculate Stats
-    const total = o.inventory.length;
-    const active = o.inventory.filter(i => i.status === 'Activo').length;
-    const stock = o.inventory.filter(i => i.status === 'Stock').length;
-    const repair = o.inventory.filter(i => i.status === 'Reparación').length;
-    const decom = o.inventory.filter(i => i.status === 'Baja').length;
+    if (allIssues.length > 0) {
+        Swal.fire({
+            title: t(currentLang, 'pdfIntegrityWarnTitle'), // New translation key
+            html: `<p>${t(currentLang, 'pdfIntegrityWarnText')}</p><ul>${allIssues.map(issue => `<li>${issue}</li>`).join('')}</ul>`, // New translation key
+            icon: 'warning',
+            confirmButtonText: t(currentLang, 'understood') // New translation key
+        });
+        return;
+    }
 
-    const stats = [
-        tPdf(currentLang, 'pdfSummaryBoxTitle'),
-        `${tPdf(currentLang, 'pdfTotal')}: ${total} | ${tPdf(currentLang, 'Activo')}: ${active} | ${tPdf(currentLang, 'Stock')}: ${stock}`,
-        `${tPdf(currentLang, 'Reparación')}: ${repair} | ${tPdf(currentLang, 'Baja')}: ${decom}`
-    ];
+    // 2. Final Checklist (New)
+    showFinalChecklist(() => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'l', unit: 'mm', format: 'a4' });
+        const currentLang = localStorage.getItem('pocketITCheckLang') || 'es';
 
-    // 2. Header (Type A with Stats)
-    const title = tPdf(currentLang, 'pdfInventoryTitle');
-    const rightLines = [
-        `${tPdf(currentLang, 'pdfDateCol')}: ${o.auditDate || new Date().toISOString().split('T')[0]}`
-    ];
-    let y = drawHeaderTypeA(doc, title, [5, 150, 105], rightLines, currentLang, stats);
+        // 1. Calculate Stats
+        const total = o.inventory.length;
+        const active = o.inventory.filter(i => i.status === 'Activo').length;
+        const stock = o.inventory.filter(i => i.status === 'Stock').length;
+        const repair = o.inventory.filter(i => i.status === 'Reparación').length;
+        const decom = o.inventory.filter(i => i.status === 'Baja').length;
 
-    // 3. Subheader (Office Info)
-    y = drawSubheader(doc, o, y + 5, currentLang);
-
-    // 4. Inventory Table
-    const tableData = o.inventory.map(item => {
-        const specs = item.specs || {};
-        const parts = [];
-        if (specs.dyn_os) parts.push(`${t(currentLang, 'os')}: ${specs.dyn_os}`);
-        if (specs.dyn_cpu) parts.push(`${t(currentLang, 'cpu')}: ${specs.dyn_cpu}`);
-        if (specs.dyn_ram) parts.push(`${t(currentLang, 'ram')}: ${specs.dyn_ram}`);
-        if (specs.dyn_storage) parts.push(`${t(currentLang, 'storage')}: ${specs.dyn_storage}`);
-        if (specs.dyn_mac) parts.push(`${t(currentLang, 'mac')}: ${specs.dyn_mac}`);
-        if (item.notes) parts.push(`${t(currentLang, 'extraNotes')}: ${item.notes}`);
-        
-        let specStr = parts.join(' | ');
-        if (item.purchaseDate || item.warrantyDate) {
-            specStr += `\n[${t(currentLang, 'purchaseDateLabel')}: ${item.purchaseDate || '-'} - ${t(currentLang, 'warrantyUntilLabel')}: ${item.warrantyDate || '-'}]`;
-        }
-
-        return [
-            item.assetTag || '-',
-            t(currentLang, item.status) || item.status,
-            `${t(currentLang, item.type)}\n${item.model}`,
-            `S/N: ${item.serial || '-'}\nUsu: ${item.user || '-'}`,
-            specStr
+        const stats = [
+            tPdf(currentLang, 'pdfSummaryBoxTitle'),
+            `${tPdf(currentLang, 'pdfTotal')}: ${total} | ${tPdf(currentLang, 'Activo')}: ${active} | ${tPdf(currentLang, 'Stock')}: ${stock}`,
+            `${tPdf(currentLang, 'Reparación')}: ${repair} | ${tPdf(currentLang, 'Baja')}: ${decom}`
         ];
+
+        // 2. Header (Type A with Stats)
+        const title = tPdf(currentLang, 'pdfInventoryTitle');
+        const rightLines = [
+            `${tPdf(currentLang, 'pdfDateCol')}: ${o.auditDate || new Date().toISOString().split('T')[0]}`
+        ];
+        let y = drawHeaderTypeA(doc, title, [5, 150, 105], rightLines, currentLang, stats);
+
+        // 3. Subheader (Office Info)
+        y = drawSubheader(doc, o, y + 5, currentLang);
+
+        // 4. Inventory Table
+        const tableData = o.inventory.map(item => {
+            const diagObj = item.diagnostics || {};
+            const issuesFound = [];
+            DIAG_STRUCTURE.forEach(cat => {
+                cat.groups.forEach(group => {
+                    group.items.forEach(it => {
+                        if ((diagObj[cat.category] || {})[it.id] === false) {
+                            issuesFound.push(t(currentLang, it.label));
+                        }
+                    });
+                });
+            });
+
+            // Extract notes, and optionally, photo info
+            let notesContent = item.notes || '';
+            const photoMatch = notesContent.match(/\[FOTO EQUIPO capturada: (.*?)\]/);
+            if (photoMatch) {
+                // If photo info is present, display it concisely
+                notesContent = notesContent.replace(photoMatch[0], '').trim(); // Remove photo tag from general notes
+                notesContent = `${notesContent}\n(Foto adjunta: ${photoMatch[1].split(' - ')[0]})`.trim();
+            }
+
+
+            return [
+                item.assetTag || '-',
+                t(currentLang, item.status) || item.status,
+                `${t(currentLang, item.type)}\\n${item.model}`,
+                `S/N: ${item.serial || '-'}\\nUsu: ${item.user || '-'}`,
+                issuesFound.length > 0 ? issuesFound.join(', ') : 'OK',
+                notesContent.length > 0 ? notesContent : '-'
+            ];
+        });
+
+        doc.autoTable({
+            startY: y + 2,
+            head: [[
+                tPdf(currentLang, 'pdfColID'),
+                tPdf(currentLang, 'pdfColStatus'),
+                tPdf(currentLang, 'pdfColCatMod'),
+                tPdf(currentLang, 'pdfColSNAsig'),
+                tPdf(currentLang, 'pdfColDiagSummary'), // New translation key
+                tPdf(currentLang, 'pdfColNotes') // New translation key
+            ]],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [5, 150, 105], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+            bodyStyles: { fontSize: 7, textColor: [30, 41, 59] },
+            columnStyles: {
+                0: { cellWidth: 20 },
+                1: { cellWidth: 18 },
+                2: { cellWidth: 38 },
+                3: { cellWidth: 38 },
+                4: { cellWidth: 45 }, // Adjusted width
+                5: { cellWidth: 'auto' } // New column
+            },
+            alternateRowStyles: { fillColor: [248, 250, 252] },
+            margin: { left: 14, right: 14 }
+        });
+
+        // 5. Signatures
+        drawModelSignatures(doc, doc.lastAutoTable.finalY + 10, o, currentLang);
+
+        // 6. Page Numbers
+        addModelPageNumbers(doc, currentLang);
+
+        doc.save(`Inventory_${o.company}_${new Date().toISOString().split('T')[0]}.pdf`);
     });
-
-    doc.autoTable({
-        startY: y + 2,
-        head: [[
-            tPdf(currentLang, 'pdfColID'),
-            tPdf(currentLang, 'pdfColStatus'),
-            tPdf(currentLang, 'pdfColCatMod'),
-            tPdf(currentLang, 'pdfColSNAsig'),
-            tPdf(currentLang, 'pdfColSpecs')
-        ]],
-        body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: [5, 150, 105], textColor: 255, fontSize: 8, fontStyle: 'bold' },
-        bodyStyles: { fontSize: 7, textColor: [30, 41, 59] },
-        columnStyles: {
-            0: { cellWidth: 20 },
-            1: { cellWidth: 18 },
-            2: { cellWidth: 38 },
-            3: { cellWidth: 38 },
-            4: { cellWidth: 'auto' }
-        },
-        alternateRowStyles: { fillColor: [248, 250, 252] },
-        margin: { left: 14, right: 14 }
-    });
-
-    // 5. Signatures
-    drawModelSignatures(doc, doc.lastAutoTable.finalY + 10, o, currentLang);
-
-    // 6. Page Numbers
-    addModelPageNumbers(doc, currentLang);
-
-    doc.save(`Inventory_${o.company}_${new Date().toISOString().split('T')[0]}.pdf`);
 };
 
 window.generateMasterMaintenancePlanPDF = () => {

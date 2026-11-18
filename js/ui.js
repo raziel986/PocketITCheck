@@ -120,23 +120,45 @@ export async function safeFetch(url, options = {}) {
     }
 }
 
-/* New: Validate that required fields are filled before form submission */
-export function validateRequiredFields(formElement, fieldSelectors) {
-    let isValid = true;
-    const inputs = formElement.querySelectorAll(fieldSelectors.join(', '));
+/* New: Validation Logic for Integrity and Final Checklist */
+export function checkProceduralIntegrity(item) {
+    const diagObj = item.diagnostics || {};
+    const result = item.maintenanceResult || { resolvedItems: [] };
+    const unresolvedIssues = [];
 
-    inputs.forEach(input => {
-        if (input.hasAttribute('required') && !input.value.trim()) {
-            isValid = false;
-            input.style.borderColor = '#ef4444';
-            input.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.1)';
-        } else {
-            input.style.borderColor = '';
-            input.style.boxShadow = '';
-        }
+    DIAG_STRUCTURE.forEach(cat => {
+        cat.groups.forEach(group => {
+            group.items.forEach(it => {
+                if ((diagObj[cat.category] || {})[it.id] === false) {
+                    if (!result.resolvedItems.includes(`${cat.category}:${it.id}`)) {
+                        unresolvedIssues.push(t('es', it.label));
+                    }
+                }
+            });
+        });
     });
+    return unresolvedIssues;
+}
 
-    return isValid;
+export function showFinalChecklist(onConfirm) {
+    Swal.fire({
+        title: '🔒 Checklist de Cierre',
+        html: `
+            <div style="text-align: left; font-size: 0.9rem;">
+                <label style="display:block; margin: 10px 0;"><input type="checkbox" id="check1"> ¿Se realizó limpieza física?</label>
+                <label style="display:block; margin: 10px 0;"><input type="checkbox" id="check2"> ¿Equipo enciende correctamente?</label>
+                <label style="display:block; margin: 10px 0;"><input type="checkbox" id="check3"> ¿Reporte validado por cliente?</label>
+            </div>
+        `,
+        confirmButtonText: 'Generar Informe',
+        preConfirm: () => {
+            if (!document.getElementById('check1').checked || !document.getElementById('check2').checked || !document.getElementById('check3').checked) {
+                Swal.showValidationMessage('Debes completar todo el checklist para cerrar el servicio.');
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) onConfirm();
+    });
 }
 
 /* New: Show error summary for form validation */
