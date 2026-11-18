@@ -1,4 +1,4 @@
-import { applyTranslations, updatePagination, categoryFields } from './js/ui.js';
+import { applyTranslations, updatePagination, categoryFields, collectSystemInfo } from './js/ui.js';
 import { t, tPdf } from './js/translations.js';
 import { getStatusColor, drawHeaderTypeA, drawHeaderTypeB, drawSubheader, drawModelSignatures, addModelPageNumbers } from './js/pdf_engine.js';
 import { getAllOffices, saveOffice, deleteOffice, migrateFromLocalStorage } from './js/db.js';
@@ -75,6 +75,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (dom.officeForm) {
         dom.officeForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Validate required fields before submitting
+            const isValid = validateRequiredFields(dom.officeForm,
+                ['#officeCompany', '#officeDepto', '#officeLocation', '#officeAuditor']);
+            if (!isValid) {
+                showErrorSummary(['Todos los campos marcados con * son obligatorios']);
+                return;
+            }
+
             const newOffice = {
                 id: editingOfficeId || Date.now().toString(),
                 company: document.getElementById('officeCompany').value.trim(),
@@ -107,6 +116,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (dom.equipForm) {
         dom.equipForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Validate required fields before submitting
+            const isValid = validateRequiredFields(dom.equipForm,
+                ['#type', '#model', '#serial', '#assetTag', '#status', '#user']);
+            if (!isValid) {
+                showErrorSummary(['Por favor completa todos los campos obligatorios marcados con *']);
+                return;
+            }
+
             const o = appData.find(off => off.id === activeOfficeId);
             if (!o) return;
             const specs = {};
@@ -152,6 +170,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Start the app
     init();
+
+    // Initialize mobile optimizations
+    document.addEventListener('DOMContentLoaded', () => {
+        // Auto-resize textareas
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(el => autoResizeTextarea(el));
+
+        // Handle mobile form scroll to prevent viewport jumps
+        handleMobileFormScroll();
+
+        // Add pull-to-refresh already implemented via touch events in ui.js
+
+        // Show initial status if coming from pull-to-refresh
+        if (window.location.hash === '#refreshed') {
+            showStatusBanner('Datos actualizados correctamente', 'success', 2000);
+            window.location.hash = '';
+        }
+    });
 });
 
 // Init
@@ -181,24 +217,290 @@ async function init() {
     }
 }
 
-// Global Exports for HTML
-window.toggleLanguage = (isEn) => {
+// Capture equipment photo and set it as the model/serial placeholder or notes
+window.captureEquipmentPhotoAndSave = async () => {
+    const photoDataURL = await captureEquipmentPhoto();
+
+    if (!photoDataURL) return;
+
+    // Store the photo in a hidden field or append to notes
+    const notesInput = document.getElementById('notes');
+    if (notesInput) {
+        // Append info about the photo capture
+        const existingNotes = notesInput.value.trim();
+        const photoInfo = `\n[FOTO EQUIPO capturada: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} - ${existingNotes ? '| ' : ''}${existingNotes}`;
+
+        notesInput.value = photoInfo + (existingNotes ? '' : '');
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: ' Foto capturada',
+                text: 'La foto se ha agregado a las notas del equipo.',
+                icon: 'success',
+                confirmButtonText: 'Ver foto'
+            });
+        }
+    } else {
+        // If no notes field, store in a data attribute on the form
+        const equipForm = document.getElementById('inventoryForm');
+        if (equipForm) {
+            equipForm.dataset.equipmentPhoto = photoDataURL;
+        }
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: ' Foto capturada',
+                text: 'La foto se ha guardado temporalmente.',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+    }
+};
+
+// Check warranty status automatically and show alert
+// Also update the UI display
+window.checkWarrantyStatusAuto = () => {
+    const hasWarranty = document.getElementById('hasWarranty').value;
+    const purchaseDate = document.getElementById('purchaseDate')?.value;
+    const warrantyDate = document.getElementById('warrantyDate')?.value;
+    const statusDisplay = document.getElementById('warrantyStatusDisplay');
+    const statusText = document.getElementById('warrantyStatusText');
+
+    // Update UI display
+    if (statusDisplay && statusText) {
+        if (hasWarranty === 'Si' && purchaseDate && warrantyDate) {
+            const result = window.diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
+            statusDisplay.style.display = 'block';
+            statusText.textContent = result.message;
+
+            // Color code
+            const colorMap = {
+                active: '#10b981',
+                expiring_soon: '#f59e0b',
+                expired: '#ef4444'
+            };
+            statusDisplay.style.color = colorMap[result.status] || '#647489';
+        } else {
+            statusDisplay.style.display = 'none';
+        }
+    }
+
+    // Show alert if expiring soon or expired
+    if (hasWarranty === 'Si' && purchaseDate && warrantyDate) {
+        const result = window.diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
+
+        if (result.status === 'expiring_soon' || result.status === 'expired') {
+            const icon = result.status === 'expired' ? 'error' : 'warning';
+            Swal.fire({
+                title: 'Alerta de Garantía',
+                text: result.message,
+                icon: icon,
+                confirmButtonText: 'Entendido'
+            });
+        }
+    }
+};
+
+// Collect system info and fill form fields
+window.collectAndFillSystemInfo = async () => {
+    const hasWarranty = document.getElementById('hasWarranty').value;
+    const purchaseDate = document.getElementById('purchaseDate')?.value;
+    const warrantyDate = document.getElementById('warrantyDate')?.value;
+
+    if (hasWarranty === 'Si' && purchaseDate && warrantyDate) {
+        const result = window.diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
+
+        if (typeof Swal !== 'undefined') {
+            const icon = result.daysRemaining > 0 ? 'success' : result.daysRemaining > -30 ? 'warning' : 'error';
+            Swal.fire({
+                title: 'Estado de Garantía',
+                text: result.message,
+                icon: icon,
+                confirmButtonText: 'Entendido'
+            });
+        }
+    }
+};
+
+// Field Repair Mode - optimized for field technicians
+window.fieldMode = {
+    active: false,
+    // Quick access to most common actions
+    shortcuts: {
+        'KeyD': 'toggleDiagnostic',     // Open diagnostic
+        'KeyM': 'toggleMaintenance',    // Open maintenance result
+        'KeyS': 'saveCurrent',          // Save current item
+        'KeyC': 'closeCurrent',         // Close current window
+        'KeyR': 'refreshTable',         // Refresh data
+        'KeyN': 'showAddEquipmentForm', // New equipment shortcut
+    },
+
+    // Toggle field mode on/off
+    toggle() {
+        this.active = !this.active;
+        const fab = document.getElementById('mainFAB');
+        if (fab) {
+            if (this.active) {
+                fab.style.background = '#dc2626';
+                fab.title = 'Modo Campo Activo - Presiona ? para ayuda';
+            } else {
+                fab.style.background = '';
+                fab.title = 'PocketITCheck';
+            }
+        }
+        return this.active;
+    },
+
+    // Handle keyboard shortcuts
+    handleKeyDown(event) {
+        if (!this.active) return;
+
+        const key = event.code;
+        const handler = this.shortcuts[key];
+
+        if (handler && typeof window[handler] === 'function') {
+            event.preventDefault();
+            window[handler]();
+        }
+    }
+};
+
+};
+
+// Register keyboard event listener
+document.addEventListener('keydown', (event) => {
+    window.fieldMode.handleKeyDown(event);
+});
+
+// Field mode F1 help overlay
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'F1') {
+        event.preventDefault();
+        const helpText = `<!DOCTYPE html><html><body style="font-family:Inter,sans-serif;background:#f7f9fb;padding:2rem;color:#111827;"><div style="background:white;padding:1.5rem;border-radius:12px;max-width:400px;margin:auto;"><h3 style="margin-top:0;">⚙️ Field Mode Shortcuts</h3><p style="font-size:0.9rem;margin:0.5rem 0;">Press the key to execute:</p><ul style="font-size:0.85rem;margin:0.3rem 0 0 1.2rem;"><li><kbd>D</kbd> - Open diagnostic</li><li><kbd>M</kbd> - Open maintenance result</li><li><kbd>S</kbd> - Save current item</li><li><kbd>C</kbd> - Close current window</li><li><kbd>R</kbd> - Refresh data</li><li><kbd>N</kbd> - Add new equipment</li></ul><p style="text-align:right;margin-top:1rem;"><button onclick="window.close()" style="background:#3b82f6;color:white;padding:0.4rem 0.8rem;border:none;border-radius:6px;font-size:0.8rem;">Close</button></p></div></body></html>`;
+        Swal.fire({ title: 'Field Mode Shortcuts', html: helpText, width: 'auto', padding: '1rem', confirmButtonText: 'Got it' });
+    }
+});
+
+// Collect system info and fill form fields
+window.collectAndFillSystemInfo = async () => {
+window.collectAndFillSystemInfo = async () => {
+    const info = await collectSystemInfo();
+
+    // Fill OS field
+    const osInput = document.getElementById('officeManager');
+    if (osInput) {
+        osInput.value = info.os || '';
+    }
+
+    // Fill dynamic fields based on type
+    const typeSelect = document.getElementById('type');
+    if (typeSelect && categoryFields[typeSelect.value]) {
+        updateDynamicFields(typeSelect.value);
+    }
+
+    // Show a brief message
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Info del Sistema',
+            text: `OS: ${info.os}\nCPU: ${info.cpu}\nRAM estimada: ${info.ram}\nAlmacenamiento: ${info.storage}`,
+            icon: 'info',
+            confirmButtonText: 'Cerrar'
+        });
+    }
+};
+
+// Add system info button to dynamic container after form render
+document.addEventListener('DOMContentLoaded', () => {
+    // Ensure button appears after dynamic fields are rendered
+    const setupSystemInfoButton = () => {
+        const btn = document.getElementById('btnCollectSystemInfo');
+        if (!btn) return;
+
+        // Position it below the dynamic fields
+        const dynamicContainer = document.getElementById('dynamicFieldsContainer');
+        if (dynamicContainer && !btn.parentNode.contains(dynamicContainer)) {
+            // Insert after the last form-group
+            const lastGroup = dynamicContainer.querySelector('.form-group:last-child');
+            if (lastGroup) {
+                dynamicContainer.insertBefore(btn, lastGroup.nextSibling);
+            } else {
+                dynamicContainer.appendChild(btn);
+            }
+        }
+    };
+
+    // Run after a short delay to ensure DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupSystemInfoButton);
+    } else {
+        setupSystemInfoButton();
+    }
+});
+
+// Mobile gesture: pull-to-refresh via touchstart/move/end on table containers
+(function() {
+    let touchStartY = 0;
+    let isRefreshing = false;
+    const minSwipeDist = 80; // pixels
+    const refreshContainers = ['#officesTable', '#inventoryTable'];
+
+    refreshContainers.forEach(selector => {
+        const container = document.querySelector(selector);
+        if (!container) return;
+
+        container.addEventListener('touchstart', (e) => {
+            // Only start from the very top of the container
+            if (container.scrollTop === 0) {
+                touchStartY = e.touches[0].clientY;
+            } else {
+                touchStartY = -1; // Not at top, ignore
+            }
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+            if (touchStartY < 0) return;
+            const dy = e.touches[0].clientY - touchStartY;
+            // Only pull down from top; allow bounce via native scroll
+            if (dy > 0 && container.scrollTop === 0) {
+                e.preventDefault();
+                // Visual feedback: could add a pull indicator later
+            }
+        }, { passive: false });
+
+        container.addEventListener('touchend', () => {
+            // If user pulled down enough, trigger refresh
+            if (container.scrollTop <= 0 && !isRefreshing) {
+                // Small delay to let the bounce settle, then refresh
+                setTimeout(() => {
+                    if (selector === '#officesTable') renderOfficesTable();
+                    else renderTable();
+                }, 300);
+            }
+        });
+    });
+})();
+
+export function toggleLanguage(isEn) {
     currentLang = isEn ? 'en' : 'es';
     localStorage.setItem('pocketITCheckLang', currentLang);
     applyTranslations(currentLang);
-    renderOfficesTable();
-    if (activeOfficeId) {
-        renderTable();
-        const o = appData.find(o => o.id === activeOfficeId);
-        if (o) updateOfficeSummaryUI(o);
-    }
-};
+}
 
 window.handleSearch = (tableType, query) => {
     tableState[tableType].searchQuery = query.toLowerCase();
     tableState[tableType].currentPage = 1;
     if (tableType === 'offices') renderOfficesTable();
     else renderTable();
+};
+
+// Pull-to-refresh hook — called when user does a downward drag
+// on the table area. This is a simple touch gesture implementation
+// that re-renders the current table to refresh data.
+window.refreshTablePull = () => {
+    if (activeOfficeId) {
+        renderTable();
+        renderOfficesTable();
+    }
 };
 
 window.changeLength = (tableType, length) => {
@@ -954,6 +1256,51 @@ window.closeMaintenanceResult = () => {
     const resultSection = document.getElementById('result-integrated-section');
     if (resultSection) resultSection.style.display = 'none';
     if (dom.viewEquip) dom.viewEquip.style.display = 'block';
+};
+
+// Field Repair Mode shortcuts
+window.toggleDiagnostic = () => {
+    if (activeOfficeId) {
+        window.showAddEquipmentForm();
+        const o = appData.find(off => off.id === activeOfficeId);
+        if (o && o.inventory.length > 0) {
+            // Open diagnostic for last item or first available
+            window.openDiagnostic(o.inventory.length - 1);
+        }
+    }
+};
+
+window.toggleMaintenance = () => {
+    if (activeOfficeId) {
+        const o = appData.find(off => off.id === activeOfficeId);
+        if (o && o.inventory.length > 0) {
+            window.openMaintenanceResult(o.inventory.length - 1);
+        }
+    }
+};
+
+window.saveCurrent = () => {
+    // Save the current diagnostic or maintenance result
+    if (diagnosticIndex !== null) {
+        window.saveIntegratedDiagnosticFlow();
+    } else if (resultIndex !== null) {
+        window.saveMaintenanceResult();
+    }
+};
+
+window.closeCurrent = () => {
+    if (diagnosticIndex !== null) {
+        window.closeIntegratedDiagnostic();
+    } else if (resultIndex !== null) {
+        window.closeMaintenanceResult();
+    }
+};
+
+window.refreshTable = () => {
+    if (activeOfficeId) {
+        renderTable();
+        renderOfficesTable();
+    }
 };
 
 

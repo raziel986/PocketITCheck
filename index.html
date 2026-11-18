@@ -239,10 +239,13 @@
                         </div>
                         <div class="form-group">
                             <label data-i18n="warrantyCover">?Cobertura de Garantia Vigente?</label>
-                            <select id="hasWarranty" onchange="toggleDates()">
+                            <select id="hasWarranty" onchange="toggleDates(); checkWarrantyStatusAuto()">
                                 <option value="Si">Si</option>
                                 <option value="No" selected>No</option>
                             </select>
+                        </div>
+                        <div class="form-group" id="warrantyStatusDisplay" style="margin-top: 0.5rem; padding: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6; display: none; font-size: 0.85rem; color: #647489;">
+                            <span id="warrantyStatusText"></span>
                         </div>
                         <div class="form-group" id="purchaseDateContainer" style="display: none;">
                             <label data-i18n="purchaseDateLabel">Fecha de Compra</label>
@@ -261,6 +264,26 @@
 
                     <!-- Contenedor dinamico segun categoria -->
                     <div id="dynamicFieldsContainer" style="margin-top: 0.5rem;"></div>
+
+                    <!-- Nueva sección: Auto-rellenado de sistema -->
+                    <div class="form-group" style="margin-top: 0.5rem;">
+                        <button type="button" id="btnCollectSystemInfo" class="btn btn-submit w-100"
+                            style="background: #3b82f6; color: white; border: none; padding: 0.5rem;"
+                            onclick="collectAndFillSystemInfo()">
+                            <span class="material-symbols-outlined">system_update_alt</span>
+                            Auto-rellenar Sistema
+                        </button>
+                    </div>
+
+                    <!-- Nueva sección: Captura de foto del equipo -->
+                    <div class="form-group" style="margin-top: 0.5rem;">
+                        <button type="button" id="btnCapturePhoto" class="btn btn-submit w-100"
+                            style="background: #10b981; color: white; border: none; padding: 0.5rem;"
+                            onclick="captureEquipmentPhotoAndSave()">
+                            <span class="material-symbols-outlined">camera_alt</span>
+                            Capturar Foto del Equipo
+                        </button>
+                    </div>
 
                     <div class="form-group" style="margin-top: 1rem;">
                         <label data-i18n="extraNotes">Notas Adicionales</label>

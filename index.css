@@ -45,6 +45,13 @@
     padding: 0;
 }
 
+/* Prevent text zoom / unintended scaling on mobile while keeping pinch-zoom enabled */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    touch-action: pan-y;
+}
+
 body {
     background-color: var(--background);
     font-family: var(--font-body);
@@ -52,6 +59,30 @@ body {
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    /* Smooth scroll for programmatic focus scrolling on mobile keyboards */
+    scroll-behavior: smooth;
+}
+
+/* Global: remove the default tap highlight on touch devices so buttons
+   feel native and don't show the grey overlay on iOS/Android. */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Make every interactive control use the most efficient touch action.
+   `manipulation` tells the browser the gesture is a simple tap/scroll,
+   which reduces latency and prevents accidental double-tap zoom. */
+button,
+a,
+[role="button"],
+input[type="checkbox"],
+input[type="radio"],
+select,
+textarea,
+.summary-row,
+.settings-item,
+.accordion-header {
+    touch-action: manipulation;
 }
 
 /* Header / TopAppBar */
@@ -192,6 +223,9 @@ textarea {
     font-size: 0.95rem;
     color: var(--on-surface);
     transition: all 0.2s ease;
+    /* Minimum 48px touch target for all form controls (WCAG 2.5.5 Target Size) */
+    min-height: 48px;
+    touch-action: manipulation;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -215,6 +249,9 @@ input:focus, select:focus, textarea:focus {
     transition: all 0.2s ease;
     border: none;
     text-decoration: none;
+    /* Minimum 48px touch target for all primary/secondary buttons */
+    min-height: 48px;
+    touch-action: manipulation;
 }
 
 .btn-submit {
@@ -286,9 +323,12 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
 }
 
 .length-select {
-    padding: 0.4rem 0.6rem !important;
-    font-size: 0.8rem !important;
-    min-width: 80px;
+    padding: 0.6rem 0.8rem !important;
+    font-size: 0.85rem !important;
+    min-width: 96px;
+    /* Minimum 48px touch target for the length selector */
+    min-height: 48px;
+    touch-action: manipulation;
 }
 
 .search-input-wrapper {
@@ -329,6 +369,8 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
     padding-bottom: env(safe-area-inset-bottom, 0);
     border-top: 1px solid var(--outline-variant);
     z-index: 100;
+    /* Prevent the bottom nav from being hijacked by a bottom gesture bar */
+    overscroll-behavior: contain;
 }
 
 .nav-item {
@@ -341,6 +383,10 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
     transition: all 0.2s;
     padding: 0.4rem 1rem;
     border-radius: 12px;
+    /* Ensure each tab is at least 48px tall and easy to hit */
+    min-height: 48px;
+    min-width: 48px;
+    touch-action: manipulation;
 }
 
 .nav-item.active {
@@ -363,8 +409,8 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
     position: fixed;
     bottom: 80px;
     right: 1rem;
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 16px;
     background: var(--primary-gradient);
     color: white;
@@ -376,6 +422,9 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
     cursor: pointer;
     z-index: 90;
     transition: transform 0.2s;
+    /* Keep the FAB clear of the bottom gesture bar on notched devices */
+    bottom: calc(80px + env(safe-area-inset-bottom, 0));
+    touch-action: manipulation;
 }
 
 .fab:active {
@@ -386,8 +435,8 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
 .switch {
     position: relative;
     display: inline-block;
-    width: 56px;
-    height: 28px;
+    width: 64px;
+    height: 32px;
 }
 
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -406,10 +455,11 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
     align-items: center;
     justify-content: space-around;
     padding: 0 4px;
+    touch-action: manipulation;
 }
 
 .slider-text {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     font-weight: 800;
     color: var(--outline);
     z-index: 1;
@@ -422,9 +472,9 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
 .slider:before {
     position: absolute;
     content: "";
-    height: 20px;
-    width: 24px;
-    left: 4px;
+    height: 24px;
+    width: 26px;
+    left: 3px;
     bottom: 4px;
     background-color: var(--primary);
     transition: .4s;
@@ -433,7 +483,7 @@ tr td:last-child { border-top-right-radius: var(--radius-lg); border-bottom-righ
 }
 
 input:checked + .slider:before {
-    transform: translateX(24px);
+    transform: translateX(28px);
 }
 
 /* ====== Office Cards ====== */
@@ -569,8 +619,8 @@ input:checked + .slider:before {
 }
 
 .icon-btn-circle {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -580,10 +630,11 @@ input:checked + .slider:before {
     color: var(--on-surface-variant);
     cursor: pointer;
     transition: all 0.2s;
+    touch-action: manipulation;
 }
 
 .icon-btn-circle .material-symbols-outlined {
-    font-size: 1.15rem;
+    font-size: 1.3rem;
 }
 
 .icon-btn-circle:hover {
@@ -612,18 +663,19 @@ input:checked + .slider:before {
 
 /* Icon Buttons for toolbar */
 .icon-btn, .icon-btn-info {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     background: var(--surface-container-high);
     color: var(--on-surface-variant);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.1rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    touch-action: manipulation;
 }
 
 .icon-btn:hover, .icon-btn-info:hover {
@@ -691,18 +743,19 @@ input:checked + .slider:before {
 }
 
 .pagination-btn {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     background: var(--surface-container-high);
     color: var(--on-surface);
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    touch-action: manipulation;
 }
 
 .pagination-btn:disabled {
@@ -730,21 +783,24 @@ input:checked + .slider:before {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.4rem 0.85rem;
+    padding: 0.6rem 1rem;
     border: 1px solid var(--outline-variant);
-    border-radius: 10px;
+    border-radius: 12px;
     background: var(--surface-container-low);
     color: var(--on-surface-variant);
     font-family: var(--font-body);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     margin-bottom: 0.75rem;
+    /* Minimum 48px touch target for the back button */
+    min-height: 48px;
+    touch-action: manipulation;
 }
 
 .btn-back .material-symbols-outlined {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
 }
 
 .btn-back:hover {
@@ -784,13 +840,13 @@ input:checked + .slider:before {
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.5rem 0.75rem;
+    padding: 0.7rem 0.9rem;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     background: var(--surface-container-lowest);
     color: var(--on-surface-variant);
     font-family: var(--font-body);
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -798,10 +854,13 @@ input:checked + .slider:before {
     flex: 1;
     justify-content: center;
     border: 1px solid transparent;
+    /* Minimum 48px touch target for report toolbar buttons */
+    min-height: 48px;
+    touch-action: manipulation;
 }
 
 .report-btn .material-symbols-outlined {
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     color: var(--primary);
 }
 
@@ -853,10 +912,10 @@ input:checked + .slider:before {
 
 /* Equipment action buttons - cleaner */
 .equip-action-btn {
-    width: 34px;
-    height: 34px;
+    width: 48px;
+    height: 48px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     background: var(--surface-container-high);
     cursor: pointer;
     display: flex;
@@ -864,6 +923,7 @@ input:checked + .slider:before {
     justify-content: center;
     transition: all 0.2s;
     padding: 0;
+    touch-action: manipulation;
 }
 
 .equip-action-btn .material-symbols-outlined {
@@ -897,6 +957,23 @@ input:checked + .slider:before {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
+}
+
+/* Diagnostic checkboxes are the main interaction in the diagnostic view.
+   Bump them to a 48px touch target on mobile so technicians can reliably
+   toggle items while standing up. Inline styles in app.js override these,
+   so !important is required to win the specificity battle. */
+input[type="checkbox"].diag-item,
+input[type="checkbox"][id^="diag-"],
+input[type="checkbox"][id^="resolve-"],
+input[type="checkbox"][id^="master-"],
+input[type="checkbox"][id^="resolve-master-"] {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 
 /* Empty state */
@@ -941,6 +1018,9 @@ input:checked + .slider:before {
     -webkit-tap-highlight-color: transparent;
     transition: background 0.15s;
     gap: 0.5rem;
+    /* Full-width tap target on the accordion header */
+    min-height: 48px;
+    touch-action: manipulation;
 }
 
 .accordion-header:hover {
@@ -1235,7 +1315,7 @@ input:checked + .slider:before {
     .bottom-nav {
         display: none;
     }
-    
+
     .fab {
         bottom: 2rem;
         right: 2rem;
@@ -1257,13 +1337,59 @@ input:checked + .slider:before {
     .form-grid-3 {
         grid-template-columns: repeat(3, 1fr);
     }
-    
+
     .form-grid-4 {
         grid-template-columns: repeat(4, 1fr);
     }
 
     .diag-grid {
         grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ====== RESPONSIVE: Landscape Phone / Short Screen ======
+   When the device is rotated to landscape, the viewport is wider but
+   shorter. Use the extra width for a 2-column layout and reduce vertical
+   padding so forms don't get pushed off the bottom of the screen. */
+@media (max-height: 500px) and (min-width: 480px) {
+    .main-content {
+        padding-top: 64px;
+        padding-bottom: 80px;
+    }
+
+    .glass-card {
+        padding: 0.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 0.6rem;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+        padding: 0.5rem 0.75rem;
+        min-height: 44px;
+    }
+
+    .btn {
+        padding: 0.5rem 0.9rem;
+        min-height: 44px;
+    }
+
+    .diag-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .report-toolbar {
+        gap: 0.3rem;
+    }
+
+    .report-btn {
+        padding: 0.45rem 0.6rem;
+        font-size: 0.75rem;
     }
 }
 
@@ -1328,5 +1454,43 @@ input:checked + .slider:before {
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
         }
+    }
+
+    /* On small screens the report toolbar is a horizontal scroll row.
+       Make sure it is not clipped by the card and that buttons keep a
+       48px touch target. */
+    .report-toolbar {
+        gap: 0.4rem;
+        padding: 0.5rem;
+    }
+
+    .report-btn {
+        padding: 0.6rem 0.7rem;
+        min-height: 48px;
+        font-size: 0.78rem;
+    }
+
+    .report-btn-label {
+        display: none;
+    }
+
+    .report-btn .material-symbols-outlined {
+        font-size: 1.4rem;
+    }
+
+    /* The diagnostic grid is a single column on phones, but keep cards
+       tappable with adequate spacing. */
+    .diag-grid {
+        gap: 0.75rem;
+    }
+
+    .diag-card {
+        padding: 1rem;
+    }
+
+    /* Accordion body is taller than 600px on a diagnostic card with many
+       items; allow it to expand to the full content height on mobile. */
+    .accordion-card.open .accordion-body {
+        max-height: none;
     }
 }
