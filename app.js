@@ -445,7 +445,6 @@ document.addEventListener('keydown', (event) => {
 
 // Collect system info and fill form fields
 window.collectAndFillSystemInfo = async () => {
-window.collectAndFillSystemInfo = async () => {
     const info = await collectSystemInfo();
 
     // Fill OS field
