@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketit-check-v13';
+const CACHE_NAME = 'pocketit-check-v14';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -10,6 +10,7 @@ const ASSETS_TO_CACHE = [
     './js/pdf_engine.js',
     './img/logo.png',
     './manifest.json',
+    './icon-192.png',
     './icon-512.png',
     './libs/jspdf.umd.min.js',
     './libs/jspdf-autotable.min.js',

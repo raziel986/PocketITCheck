@@ -77,7 +77,7 @@
     <meta name="apple-mobile-web-app-title" content="PocketITCheck">
     <link rel="icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233525cd'/%3E%3Crect x='21' y='12' width='22' height='10' rx='3' fill='white'/%3E%3Cpath d='M22 17h-5a4 4 0 0 0-4 4v25a4 4 0 0 0 4 4h26a4 4 0 0 0 4-4V21a4 4 0 0 0-4-4h-5' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M24 36l6 6 12-13' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="manifest" href="manifest.json">
 
     <!-- Librerias para Generacion de PDF (jsPDF y jsPDF-AutoTable) - LOCAL para mayor velocidad -->
@@ -88,6 +88,18 @@
 
 <body>
 
+    <!-- Aviso PWA: instalación / requisito HTTPS (se muestra desde app.js) -->
+    <div id="pwaNotice" class="pwa-notice" role="status" hidden>
+        <span class="pwa-notice-icon material-symbols-outlined" id="pwaNoticeIcon">install_mobile</span>
+        <div class="pwa-notice-body">
+            <strong id="pwaNoticeTitle" data-i18n="pwaInstallTitle">Instalar PocketITCheck</strong>
+            <span id="pwaNoticeText" data-i18n="pwaInstallText">Instálala para usarla sin conexión.</span>
+        </div>
+        <button type="button" class="pwa-notice-btn" id="pwaInstallBtn" data-i18n="pwaInstallBtn">Instalar app</button>
+        <button type="button" class="pwa-notice-close" id="pwaNoticeClose" data-i18n-title="understood" aria-label="Cerrar">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
 
     <!-- Splash Screen de Precarga -->
     <div id="splash-screen">

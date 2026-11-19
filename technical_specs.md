@@ -12,7 +12,7 @@ La aplicación sigue un enfoque de **Single Page Application (SPA)** enriquecida
 - **Lenguaje**: JavaScript Vanilla (ES6+).
 - **Interfaz**: HTML5 y CSS3 con diseño *Glassmorphism*.
 - **Módulos**: Utiliza Módulos de JavaScript (ESM) para separar la lógica de persistencia, UI y generación de documentos.
-- **Portabilidad**: Diseño "Todo-en-Uno". Puede ejecutarse abriendo el `index.html` localmente o servirse vía HTTPS para activar funciones PWA.
+- **Portabilidad**: Sin backend. Debe servirse vía HTTP(S) (los módulos ES no funcionan con `file://`); HTTPS o `localhost` son necesarios para activar el service worker y la instalación PWA.
 
 ### Componentes de Aplicación Web Progresiva (PWA)
 - **Manifest**: `manifest.json` define el nombre, iconos y colores para la instalación en dispositivos móviles.

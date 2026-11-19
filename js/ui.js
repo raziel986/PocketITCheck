@@ -409,6 +409,9 @@ function compressEquipmentImage(file, maxDimension = 1280, quality = 0.72) {
 
 // New: Automated diagnostic modes and warranty tracking
 export const diagnosticModes = {
+    // These automated checks are illustrative only: a browser cannot inspect
+    // cables, battery health, S.M.A.R.T., fans, etc. Never present them as real.
+    disclaimerKey: 'autoDiagNote',
     quick: 'Quick Test',
     standard: 'Standard Diagnostic',
     comprehensive: 'Comprehensive Test',

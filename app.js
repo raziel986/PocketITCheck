@@ -1,6 +1,6 @@
 import { applyTranslations, updatePagination, categoryFields, collectSystemInfo, checkProceduralIntegrity, showFinalChecklist, validateRequiredFields, showErrorSummary, autoResizeTextarea, handleMobileFormScroll, showStatusBanner, captureEquipmentPhoto, diagnosticModes } from './js/ui.js';
 import { t, tPdf } from './js/translations.js';
-import { getStatusColor, drawHeaderTypeA, drawHeaderTypeB, drawSubheader, drawModelSignatures, addModelPageNumbers } from './js/pdf_engine.js';
+import { getStatusColor, drawHeaderTypeA, drawHeaderTypeB, drawSubheader, drawModelSignatures, addModelPageNumbers, addPhotoEvidence } from './js/pdf_engine.js';
 import { getAllOffices, saveOffice, deleteOffice, migrateFromLocalStorage } from './js/db.js';
 
 // State
@@ -245,6 +245,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Start the app
     init();
 
+    // PWA: register the service worker and surface install/HTTPS guidance
+    setupPWA();
+
     // Initialize mobile optimizations
     // Auto-resize textareas
     const textareas = document.querySelectorAll('textarea');
@@ -476,7 +479,7 @@ window.collectAndFillSystemInfo = async () => {
     if (typeof Swal !== 'undefined') {
         Swal.fire({
             title: 'Info del Sistema',
-            text: `OS: ${info.os}\nCPU: ${info.cpu}\nRAM estimada: ${info.ram}\nAlmacenamiento: ${info.storage}`,
+            text: `OS: ${info.os}\nCPU: ${info.cpu}\nRAM estimada: ${info.ram}\nAlmacenamiento: ${info.storage}\n\n${t(currentLang, diagnosticModes.disclaimerKey)}`,
             icon: 'info',
             confirmButtonText: 'Cerrar'
         });
@@ -510,6 +513,79 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSystemInfoButton();
     }
 });
+
+// PWA setup: service worker registration, install prompt and HTTPS guidance.
+// The service worker must be registered explicitly; having sw.js on disk is not
+// enough. PWA install/offline features also require a secure (HTTPS) context.
+function setupPWA() {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch((err) => {
+                console.warn('Service worker registration failed:', err);
+            });
+        });
+    }
+
+    const notice = document.getElementById('pwaNotice');
+    const installBtn = document.getElementById('pwaInstallBtn');
+    const closeBtn = document.getElementById('pwaNoticeClose');
+    if (!notice || !installBtn || !closeBtn) return;
+
+    if (sessionStorage.getItem('pwaNoticeDismissed') === '1') return;
+
+    const isStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    if (isStandalone || navigator.standalone) return;
+
+    const titleEl = document.getElementById('pwaNoticeTitle');
+    const textEl = document.getElementById('pwaNoticeText');
+    const iconEl = document.getElementById('pwaNoticeIcon');
+    let deferredInstallPrompt = null;
+
+    const showNotice = (titleKey, textKey, iconName, canInstall = false) => {
+        if (titleEl) titleEl.setAttribute('data-i18n', titleKey);
+        if (textEl) textEl.setAttribute('data-i18n', textKey);
+        if (iconEl) iconEl.textContent = iconName;
+        applyTranslations(currentLang);
+        installBtn.hidden = !canInstall;
+        notice.hidden = false;
+    };
+
+    closeBtn.addEventListener('click', () => {
+        notice.hidden = true;
+        sessionStorage.setItem('pwaNoticeDismissed', '1');
+    });
+
+    if (!window.isSecureContext) {
+        showNotice('pwaHttpsTitle', 'pwaHttpsText', 'lock');
+        return;
+    }
+
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !navigator.userAgent.includes('Macintosh');
+    if (isIOS) {
+        // Safari does not fire beforeinstallprompt; show the native instructions.
+        showNotice('pwaInstallTitle', 'pwaIosText', 'install_mobile');
+        return;
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        showNotice('pwaInstallTitle', 'pwaInstallText', 'install_mobile', true);
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        notice.hidden = true;
+    });
+
+    installBtn.addEventListener('click', async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        if (choice && choice.outcome === 'accepted') notice.hidden = true;
+    });
+}
 
 // Connection status chip in the top app bar
 (function() {
@@ -1541,10 +1617,13 @@ window.exportToPDF = () => {
             margin: { left: 14, right: 14 }
         });
 
-        // 5. Signatures
-        drawModelSignatures(doc, doc.lastAutoTable.finalY + 10, o, currentLang);
+        // 5. Photo evidence appendix (adds its own page when photos exist)
+        const evidenceY = addPhotoEvidence(doc, o.inventory, currentLang, doc.lastAutoTable.finalY);
 
-        // 6. Page Numbers
+        // 6. Signatures
+        drawModelSignatures(doc, evidenceY + 10, o, currentLang);
+
+        // 7. Page Numbers
         addModelPageNumbers(doc, currentLang);
 
         doc.save(`Inventory_${o.company}_${new Date().toISOString().split('T')[0]}.pdf`);

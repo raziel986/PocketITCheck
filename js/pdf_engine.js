@@ -150,3 +150,63 @@ export function addModelPageNumbers(doc, currentLang) {
         doc.text(`${tPdf(currentLang, 'pdfPage')} ${i}`, pw - 15, ph - 7, { align: 'right' });
     }
 }
+
+/**
+ * Adds an appendix page with the photos attached to each equipment item.
+ * Returns the Y cursor on the last page used, or fallbackY when there are no
+ * photos (so the caller can place signatures right after the inventory table).
+ */
+export function addPhotoEvidence(doc, items, currentLang, fallbackY = 0) {
+    const photos = (items || []).filter(i =>
+        i && typeof i.photo === 'string' && i.photo.startsWith('data:image/')
+    );
+    if (!photos.length) return fallbackY;
+
+    const pw = doc.internal.pageSize.getWidth();
+    const ph = doc.internal.pageSize.getHeight();
+
+    doc.addPage();
+    let y = drawHeaderTypeA(doc, tPdf(currentLang, 'pdfPhotoEvidence'), [5, 150, 105], [], currentLang);
+
+    const cols = 3;
+    const cellW = (pw - 30) / cols;
+    const cellH = 54;
+    const imgH = 42;
+    let col = 0;
+
+    photos.forEach(item => {
+        if (y + cellH > ph - 18) {
+            doc.addPage();
+            y = 20;
+            col = 0;
+        }
+
+        const x = 15 + col * cellW;
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.3);
+        doc.roundedRect(x, y, cellW - 4, cellH, 1.5, 1.5, 'FD');
+
+        try {
+            const mime = item.photo.slice(5, item.photo.indexOf(';'));
+            const format = mime.includes('png') ? 'PNG' : 'JPEG';
+            doc.addImage(item.photo, format, x + 2, y + 2, cellW - 8, imgH, undefined, 'FAST');
+        } catch (err) {
+            console.warn('No se pudo incrustar la foto de', item.assetTag, err);
+        }
+
+        const caption = doc.splitTextToSize(item.assetTag || '-', cellW - 10)[0];
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7);
+        doc.setTextColor(15, 23, 42);
+        doc.text(caption, x + (cellW - 4) / 2, y + imgH + 8, { align: 'center' });
+
+        col++;
+        if (col >= cols) {
+            col = 0;
+            y += cellH + 4;
+        }
+    });
+
+    return col === 0 ? y : y + cellH + 4;
+}
