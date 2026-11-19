@@ -429,8 +429,6 @@ window.fieldMode = {
     }
 };
 
-};
-
 // Register keyboard event listener
 document.addEventListener('keydown', (event) => {
     window.fieldMode.handleKeyDown(event);
