@@ -1737,6 +1737,65 @@ textarea::placeholder {
     box-shadow: 0 6px 14px rgba(15, 157, 110, 0.2);
 }
 
+/* --- Equipment photo preview ------------------------------------------- */
+.photo-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 0.6rem;
+    padding: 0.5rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    background: var(--surface-container-low);
+}
+
+.photo-preview img {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    flex-shrink: 0;
+}
+
+.photo-preview-info {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex: 1;
+    min-width: 0;
+    font-size: 0.8rem;
+    color: var(--ink-700);
+}
+
+.photo-preview-info .material-symbols-outlined {
+    font-size: 1.15rem;
+    color: #0f9d6e;
+}
+
+.photo-remove-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626;
+    cursor: pointer;
+}
+
+.photo-remove-btn .material-symbols-outlined {
+    font-size: 1.1rem;
+}
+
+.photo-link {
+    color: #3525cd;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
 .btn-info {
     background: linear-gradient(135deg, #2563eb, #3b82f6);
     color: #fff;

@@ -100,12 +100,14 @@ export async function safeFetch(url, options = {}) {
 }
 
 /* New: Validation Logic for Integrity and Final Checklist */
-export function checkProceduralIntegrity(item) {
+export function checkProceduralIntegrity(item, diagStructure = []) {
     const diagObj = item.diagnostics || {};
     const result = item.maintenanceResult || { resolvedItems: [] };
     const unresolvedIssues = [];
 
-    DIAG_STRUCTURE.forEach(cat => {
+    // diagStructure is supplied by the caller (app.js) because DIAG_STRUCTURE
+    // is module-scoped there and cannot be referenced directly from this module.
+    diagStructure.forEach(cat => {
         cat.groups.forEach(group => {
             group.items.forEach(it => {
                 if ((diagObj[cat.category] || {})[it.id] === false) {
@@ -320,77 +322,89 @@ export async function collectSystemInfo() {
     return info;
 }
 
-// New: Camera capture for equipment documentation
-export async function captureEquipmentPhoto() {
-    // Check if camera is available
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: ' Cámara no disponible',
-                text: 'Tu navegador no soporta acceso a la cámara. Usa un dispositivo con cámara o ingresa los datos manualmente.',
-                icon: 'warning',
-                confirmButtonText: 'Entendido'
-            });
+/* Camera capture for equipment documentation.
+   Uses the native camera picker (<input type="file" capture="environment">)
+   instead of getUserMedia: getUserMedia needs a secure context (HTTPS), so it
+   fails on phones when the app is served over plain HTTP, and its permission
+   prompts are unreliable on mobile browsers. This works on Android and iOS
+   and falls back to the file picker / gallery on desktop. */
+export function captureEquipmentPhoto() {
+    return new Promise((resolve) => {
+        let input = document.getElementById('equipmentPhotoInput');
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'file';
+            input.id = 'equipmentPhotoInput';
+            // Keep it out of the layout but still "clickable" on iOS Safari
+            input.style.position = 'absolute';
+            input.style.left = '-9999px';
+            input.style.width = '1px';
+            input.style.height = '1px';
+            input.style.opacity = '0';
+            document.body.appendChild(input);
         }
-        return null;
-    }
+        input.accept = 'image/*';
+        input.setAttribute('capture', 'environment');
+        // Allow taking another photo of the same file on a later capture.
+        input.value = '';
 
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: 'environment', // Try back camera on mobile
-                width: { ideal: 1920 },
-                height: { ideal: 1080 }
-            },
-            audio: false
-        });
-
-        return new Promise((resolve) => {
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.onloadeddata = () => {
-                // Set video element to display
-                video.play();
-
-                // Create canvas and capture
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-
-                // Stop all tracks
-                stream.getTracks().forEach(track => track.stop());
-
-                // Convert to data URL
-                const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-                resolve(dataURL);
-            };
-
-            video.onerror = () => {
-                stream.getTracks().forEach(track => track.stop());
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        title: 'Error de Cámara',
-                        text: 'No se pudo acceder a la cámara. Por favor, verifica los permisos.',
-                        icon: 'error',
-                        confirmButtonText: 'Entendido'
-                    });
-                }
+        // Use onchange (not addEventListener) so a cancelled capture cannot
+        // leave a stale listener behind for the next attempt.
+        input.onchange = async () => {
+            input.onchange = null;
+            const file = input.files && input.files[0];
+            if (!file) {
+                // User cancelled the camera / picker.
                 resolve(null);
+                return;
+            }
+            try {
+                resolve(await compressEquipmentImage(file));
+            } catch (err) {
+                console.error('Error al procesar la foto del equipo:', err);
+                resolve(null);
+            }
+        };
+        // Must be called from a user gesture (the button's onclick).
+        input.click();
+    });
+}
+
+/* Downscale and compress the photo so it fits comfortably in IndexedDB. */
+function compressEquipmentImage(file, maxDimension = 1280, quality = 0.72) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('No se pudo leer la imagen'));
+        reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => reject(new Error('Formato de imagen no válido'));
+            img.onload = () => {
+                let width = img.naturalWidth || img.width;
+                let height = img.naturalHeight || img.height;
+                if (!width || !height) {
+                    reject(new Error('Imagen vacía'));
+                    return;
+                }
+                if (width > maxDimension || height > maxDimension) {
+                    const scale = Math.min(maxDimension / width, maxDimension / height);
+                    width = Math.round(width * scale);
+                    height = Math.round(height * scale);
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    reject(new Error('Canvas no disponible'));
+                    return;
+                }
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
             };
-        });
-    } catch (err) {
-        console.error('Camera access error:', err);
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: 'Error de Cámara',
-                text: err.message || 'No se pudo acceder a la cámara',
-                icon: 'error',
-                confirmButtonText: 'Entendido'
-            });
-        }
-        return null;
-    }
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
 }
 
 // New: Automated diagnostic modes and warranty tracking

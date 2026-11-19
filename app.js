@@ -12,6 +12,8 @@ let editingIndex = -1;
 let editingOfficeId = null;
 let diagnosticIndex = null;
 let resultIndex = null;
+// Photo taken for the equipment currently being added/edited (JPEG data URL).
+let pendingEquipmentPhoto = null;
 let tableState = {
     offices: { searchQuery: '', currentPage: 1, itemsPerPage: 10 },
     equipment: { searchQuery: '', currentPage: 1, itemsPerPage: 10 }
@@ -217,6 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 warrantyDate: document.getElementById('warrantyDate').value,
                 user: document.getElementById('user').value.trim(),
                 notes: document.getElementById('notes').value.trim(),
+                photo: pendingEquipmentPhoto,
                 specs: specs,
                 diagnostics: editingIndex >= 0 && o.inventory[editingIndex] ? o.inventory[editingIndex].diagnostics : null,
                 maintenanceResult: editingIndex >= 0 && o.inventory[editingIndex] ? o.inventory[editingIndex].maintenanceResult : null
@@ -229,6 +232,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             await saveOffice(o);
             editingIndex = -1;
             dom.equipForm.reset();
+            pendingEquipmentPhoto = null;
+            updateEquipmentPhotoPreview(null);
             if (dom.dynamicContainer) dom.dynamicContainer.innerHTML = '';
             dom.sidebarEquip.style.display = 'none';
             dom.viewEquip.style.display = 'block';
@@ -282,44 +287,51 @@ async function init() {
     }
 }
 
-// Capture equipment photo and set it as the model/serial placeholder or notes
+// Capture a photo with the device camera and attach it to the equipment form.
 window.captureEquipmentPhotoAndSave = async () => {
     const photoDataURL = await captureEquipmentPhoto();
-
     if (!photoDataURL) return;
 
-    // Store the photo in a hidden field or append to notes
-    const notesInput = document.getElementById('notes');
-    if (notesInput) {
-        // Append info about the photo capture
-        const existingNotes = notesInput.value.trim();
-        const photoInfo = `\n[FOTO EQUIPO capturada: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} - ${existingNotes ? '| ' : ''}${existingNotes}`;
+    pendingEquipmentPhoto = photoDataURL;
+    updateEquipmentPhotoPreview(photoDataURL);
+    Swal.fire({
+        title: t(currentLang, 'photoSavedTitle'),
+        text: t(currentLang, 'photoSavedText'),
+        icon: 'success',
+        timer: 1300,
+        showConfirmButton: false
+    });
+};
 
-        notesInput.value = photoInfo + (existingNotes ? '' : '');
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: ' Foto capturada',
-                text: 'La foto se ha agregado a las notas del equipo.',
-                icon: 'success',
-                confirmButtonText: 'Ver foto'
-            });
-        }
-    } else {
-        // If no notes field, store in a data attribute on the form
-        const equipForm = document.getElementById('inventoryForm');
-        if (equipForm) {
-            equipForm.dataset.equipmentPhoto = photoDataURL;
-        }
+window.removeEquipmentPhoto = () => {
+    pendingEquipmentPhoto = null;
+    updateEquipmentPhotoPreview(null);
+};
 
-        if (typeof Swal !== 'undefined') {
-            Swal.fire({
-                title: ' Foto capturada',
-                text: 'La foto se ha guardado temporalmente.',
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-            });
-        }
+function updateEquipmentPhotoPreview(dataURL) {
+    const preview = document.getElementById('equipmentPhotoPreview');
+    const thumb = document.getElementById('equipmentPhotoThumb');
+    if (!preview || !thumb) return;
+    if (!dataURL) {
+        preview.style.display = 'none';
+        thumb.removeAttribute('src');
+        return;
     }
+    thumb.src = dataURL;
+    thumb.alt = t(currentLang, 'photoPreviewLabel');
+    preview.style.display = 'flex';
+}
+
+window.viewEquipmentPhoto = (idx) => {
+    const o = appData.find(off => off.id === activeOfficeId);
+    const item = o && o.inventory[idx];
+    if (!item || !item.photo) return;
+    Swal.fire({
+        title: item.assetTag || t(currentLang, 'photoPreviewLabel'),
+        imageUrl: item.photo,
+        imageAlt: t(currentLang, 'photoPreviewLabel'),
+        confirmButtonText: t(currentLang, 'understood')
+    });
 };
 
 // Check warranty status automatically and show alert
@@ -616,6 +628,8 @@ window.selectOffice = (id) => {
 window.showAddEquipmentForm = () => {
     editingIndex = -1;
     dom.equipForm.reset();
+    pendingEquipmentPhoto = null;
+    updateEquipmentPhotoPreview(null);
     const hw = document.getElementById('hasWarranty');
     if (hw) hw.value = 'No';
     if (typeof window.toggleDates === 'function') window.toggleDates();
@@ -644,6 +658,8 @@ window.cancelEditOffice = () => {
 window.hideAddEquipmentForm = () => {
     editingIndex = -1;
     dom.equipForm.reset();
+    pendingEquipmentPhoto = null;
+    updateEquipmentPhotoPreview(null);
     if (dom.dynamicContainer) dom.dynamicContainer.innerHTML = '';
     // Show inventory table, hide the form
     dom.sidebarEquip.style.display = 'none';
@@ -933,6 +949,10 @@ function renderTable() {
                             <span class="material-symbols-outlined">notes</span>
                             <span style="color:var(--outline); font-style:italic;">${item.notes}</span>
                         </div>` : ''}
+                        ${item.photo ? `<div class="accordion-detail-row">
+                            <span class="material-symbols-outlined">photo_camera</span>
+                            <span><a href="#" class="photo-link" onclick="event.preventDefault(); event.stopPropagation(); viewEquipmentPhoto(${item.originalIndex});">${t(currentLang, 'viewPhoto')}</a></span>
+                        </div>` : ''}
                     </div>
                     <div class="accordion-actions">
                         <button class="equip-action-btn act-edit" onclick="editEquipment(${item.originalIndex})" title="${t(currentLang,'editEquipment')}"><span class="material-symbols-outlined">edit</span></button>
@@ -965,6 +985,8 @@ window.editEquipment = (idx) => {
     document.getElementById('warrantyDate').value = item.warrantyDate || '';
     document.getElementById('user').value = item.user || '';
     document.getElementById('notes').value = item.notes || '';
+    pendingEquipmentPhoto = item.photo || null;
+    updateEquipmentPhotoPreview(pendingEquipmentPhoto);
     // Show form, hide table
     dom.viewEquip.style.display = 'none';
     dom.sidebarEquip.style.display = 'block';
@@ -1415,7 +1437,7 @@ window.exportToPDF = () => {
     // 1. Procedural Integrity Check (New)
     let allIssues = [];
     o.inventory.forEach(item => {
-        const issues = checkProceduralIntegrity(item);
+        const issues = checkProceduralIntegrity(item, DIAG_STRUCTURE);
         if (issues.length > 0) allIssues.push(`${item.assetTag}: ${issues.join(', ')}`);
     });
 
@@ -1472,13 +1494,14 @@ window.exportToPDF = () => {
                 });
             });
 
-            // Extract notes, and optionally, photo info
+            // Notes: clean up the legacy text tag and report any attached photo.
             let notesContent = item.notes || '';
-            const photoMatch = notesContent.match(/\[FOTO EQUIPO capturada: (.*?)\]/);
-            if (photoMatch) {
-                // If photo info is present, display it concisely
-                notesContent = notesContent.replace(photoMatch[0], '').trim(); // Remove photo tag from general notes
-                notesContent = `${notesContent}\n(Foto adjunta: ${photoMatch[1].split(' - ')[0]})`.trim();
+            const legacyPhotoTag = notesContent.match(/\[FOTO EQUIPO capturada: (.*?)\]/);
+            if (legacyPhotoTag) {
+                notesContent = notesContent.replace(legacyPhotoTag[0], '').trim();
+            }
+            if (item.photo || legacyPhotoTag) {
+                notesContent = `${notesContent}\n(${tPdf(currentLang, 'photoAttached')})`.trim();
             }
 
 
