@@ -17,7 +17,12 @@ let tableState = {
     equipment: { searchQuery: '', currentPage: 1, itemsPerPage: 10 }
 };
 
-const statusColorMap = { Activo: '#10b981', Stock: '#3b82f6', Reparacion: '#f59e0b', Baja: '#ef4444' };
+const statusColorMap = {
+    Activo: 'var(--success-500)',
+    Stock: 'var(--info-500, #2563eb)',
+    Reparacion: 'var(--warning-500, #d97706)',
+    Baja: 'var(--danger-500)'
+};
 
 const DIAG_STRUCTURE = [
     {
@@ -335,11 +340,11 @@ window.checkWarrantyStatusAuto = () => {
 
             // Color code
             const colorMap = {
-                active: '#10b981',
-                expiring_soon: '#f59e0b',
-                expired: '#ef4444'
+                active: 'var(--success-500)',
+                expiring_soon: 'var(--warning-500)',
+                expired: 'var(--danger-500)'
             };
-            statusDisplay.style.color = colorMap[result.status] || '#647489';
+            statusDisplay.style.color = colorMap[result.status] || 'var(--ink-500)';
         } else {
             statusDisplay.style.display = 'none';
         }
@@ -401,7 +406,7 @@ window.fieldMode = {
         const fab = document.getElementById('mainFAB');
         if (fab) {
             if (this.active) {
-                fab.style.background = '#dc2626';
+                fab.style.background = 'var(--danger-500)';
                 fab.title = 'Modo Campo Activo - Presiona ? para ayuda';
             } else {
                 fab.style.background = '';
@@ -434,7 +439,7 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('keydown', (event) => {
     if (event.code === 'F1') {
         event.preventDefault();
-        const helpText = `<!DOCTYPE html><html><body style="font-family:Inter,sans-serif;background:#f7f9fb;padding:2rem;color:#111827;"><div style="background:white;padding:1.5rem;border-radius:12px;max-width:400px;margin:auto;"><h3 style="margin-top:0;">⚙️ Field Mode Shortcuts</h3><p style="font-size:0.9rem;margin:0.5rem 0;">Press the key to execute:</p><ul style="font-size:0.85rem;margin:0.3rem 0 0 1.2rem;"><li><kbd>D</kbd> - Open diagnostic</li><li><kbd>M</kbd> - Open maintenance result</li><li><kbd>S</kbd> - Save current item</li><li><kbd>C</kbd> - Close current window</li><li><kbd>R</kbd> - Refresh data</li><li><kbd>N</kbd> - Add new equipment</li></ul><p style="text-align:right;margin-top:1rem;"><button onclick="window.close()" style="background:#3b82f6;color:white;padding:0.4rem 0.8rem;border:none;border-radius:6px;font-size:0.8rem;">Close</button></p></div></body></html>`;
+        const helpText = `<!DOCTYPE html><html><body style="font-family:Inter,sans-serif;background:#f5f4ff;padding:2rem;color:#14161a;"><div style="background:white;padding:1.5rem;border-radius:18px;max-width:420px;margin:auto;box-shadow:0 12px 28px rgba(16,24,40,0.10);"><h3 style="margin-top:0;color:#3525cd;">Field Mode Shortcuts</h3><p style="font-size:0.9rem;margin:0.5rem 0;color:#6b7280;">Press the key to execute:</p><ul style="font-size:0.85rem;margin:0.3rem 0 0 1.2rem;line-height:1.7;"><li><kbd>D</kbd> - Open diagnostic</li><li><kbd>M</kbd> - Open maintenance result</li><li><kbd>S</kbd> - Save current item</li><li><kbd>C</kbd> - Close current window</li><li><kbd>R</kbd> - Refresh data</li><li><kbd>N</kbd> - Add new equipment</li></ul><p style="text-align:right;margin-top:1rem;"><button onclick="window.close()" style="background:#3525cd;color:white;padding:0.5rem 1rem;border:none;border-radius:10px;font-size:0.8rem;cursor:pointer;">Close</button></p></div></body></html>`;
         Swal.fire({ title: 'Field Mode Shortcuts', html: helpText, width: 'auto', padding: '1rem', confirmButtonText: 'Got it' });
     }
 });
@@ -494,6 +499,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Connection status chip in the top app bar
+(function() {
+    const updateConnectionStatus = () => {
+        const chip = document.getElementById('appStatus');
+        const label = document.getElementById('appStatusLabel');
+        if (!chip || !label) return;
+        const online = navigator.onLine !== false;
+        chip.classList.toggle('is-offline', !online);
+        label.textContent = currentLang === 'en'
+            ? (online ? 'Online' : 'Offline')
+            : (online ? 'En línea' : 'Sin conexión');
+        chip.title = label.textContent;
+    };
+    document.addEventListener('DOMContentLoaded', updateConnectionStatus);
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+})();
+
 // Mobile gesture: pull-to-refresh via touchstart/move/end on table containers
 (function() {
     let touchStartY = 0;
@@ -541,7 +564,18 @@ export function toggleLanguage(isEn) {
     currentLang = isEn ? 'en' : 'es';
     localStorage.setItem('pocketITCheckLang', currentLang);
     applyTranslations(currentLang);
+
+    // Refresh dynamic tables so their translated rows follow the selected language.
+    if (document.getElementById('officesListContainer') || document.getElementById('viewOfficesTable')) {
+        renderOfficesTable();
+    }
+    if (document.getElementById('equipAccordionList')) {
+        renderTable();
+    }
 }
+
+// The language switch uses an inline onchange handler, so it must be global.
+window.toggleLanguage = toggleLanguage;
 
 window.handleSearch = (tableType, query) => {
     tableState[tableType].searchQuery = query.toLowerCase();
@@ -587,10 +621,13 @@ window.showAddEquipmentForm = () => {
     if (typeof window.toggleDates === 'function') window.toggleDates();
     if (dom.dynamicContainer) dom.dynamicContainer.innerHTML = '';
     const title = document.getElementById('equipmentFormTitle');
-    if (title) title.setAttribute('data-i18n', 'newEquipment');
+    if (title) {
+        title.setAttribute('data-i18n', 'newEquipment');
+        title.textContent = t(currentLang, 'newEquipment');
+    }
     if (dom.cancelEditBtn) dom.cancelEditBtn.style.display = 'none';
     const subBtn = document.getElementById('submitBtnEquipment');
-    if (subBtn) subBtn.innerHTML =  t(currentLang, 'addEquipment');
+    if (subBtn) subBtn.innerHTML = '<span class="material-symbols-outlined">add</span><span>' + t(currentLang, 'addEquipment') + '</span>';
     // Show the form, hide inventory table
     dom.viewEquip.style.display = 'none';
     dom.sidebarEquip.style.display = 'block';
@@ -667,12 +704,12 @@ window.handleFABClick = () => {
 
 function updateOfficeSummaryUI(o) {
     dom.activeOfficeSummary.innerHTML = `
-        <div style="font-weight: 600; margin-bottom:0.3rem;">🏢 ${o.company}</div>
-        <div style="color: #475569;">Depto: ${o.depto}</div>
-        <div style="color: #475569;">📍 ${o.location}</div>
-        <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0;">
-            <span style="color: #475569;">👤 <b>Auditor:</b> ${o.auditor}</span><br />
-            <span style="color: #475569;">👔 <b>Resp. Oficina:</b> ${o.manager} - <em>${o.managerTitle}</em></span>
+        <div class="info-row info-row-primary"><span class="material-symbols-outlined info-icon">business</span>${o.company}</div>
+        <div class="info-row">Depto: ${o.depto}</div>
+        <div class="info-row"><span class="material-symbols-outlined info-icon">location_on</span>${o.location}</div>
+        <div class="info-row info-row-meta">
+            <div><span class="material-symbols-outlined info-icon">person</span><b>Auditor:</b> ${o.auditor}</div>
+            <div><span class="material-symbols-outlined info-icon">badge</span><b>Resp. Oficina:</b> ${o.manager} - <em>${o.managerTitle}</em></div>
         </div>`;
 }
 
@@ -707,10 +744,10 @@ function renderOfficesTable() {
     if (dom.officeCountBadge) dom.officeCountBadge.textContent = `${appData.length} ${t(currentLang, 'officesCount')}`;
 
     if (filtered.length === 0) {
-        listContainer.innerHTML = `<div style="text-align:center; padding: 3rem 1rem;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">🏢</div>
-            <h3 style="margin-bottom:0.5rem;">${t(currentLang, 'emptyOffices')}</h3>
-            <p style="color:var(--outline);">${t(currentLang, 'noResults')}</p>
+        listContainer.innerHTML = `<div class="empty-state">
+            <span class="material-symbols-outlined">apartment</span>
+            <h3 style="margin-bottom:0.25rem;">${t(currentLang, 'emptyOffices')}</h3>
+            <p>${t(currentLang, 'noResults')}</p>
         </div>`;
     } else {
         const list = document.createElement('div');
@@ -840,7 +877,10 @@ function renderTable() {
     if (dom.countBadge) dom.countBadge.textContent = `${o.inventory.length} ${t(currentLang, 'equipmentCount')}`;
 
     if (filtered.length === 0) {
-        container.innerHTML = `<div class="empty-state">📭 ${t(currentLang, q ? 'noResults' : 'emptyAssets')}</div>`;
+        container.innerHTML = `<div class="empty-state">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span>${t(currentLang, q ? 'noResults' : 'emptyAssets')}</span>
+        </div>`;
     } else {
         const start = (state.currentPage - 1) * state.itemsPerPage;
         const paged = state.itemsPerPage === Infinity ? filtered : filtered.slice(start, start + state.itemsPerPage);
@@ -929,10 +969,13 @@ window.editEquipment = (idx) => {
     dom.viewEquip.style.display = 'none';
     dom.sidebarEquip.style.display = 'block';
     const title = document.getElementById('equipmentFormTitle');
-    if (title) title.textContent = '📋 ' + t(currentLang, 'editEquipment');
+    if (title) {
+        title.setAttribute('data-i18n', 'editEquipment');
+        title.textContent = t(currentLang, 'editEquipment');
+    }
     if (dom.cancelEditBtn) dom.cancelEditBtn.style.display = 'inline-block';
     const subBtn = document.getElementById('submitBtnEquipment');
-    if (subBtn) subBtn.innerHTML = '💾 ' + t(currentLang, 'saveAsset');
+    if (subBtn) subBtn.innerHTML = '<span class="material-symbols-outlined">save</span><span>' + t(currentLang, 'saveAsset') + '</span>';
 
     window.updateDynamicFields(item.type);
     if (item.specs) {
@@ -954,7 +997,7 @@ window.updateDynamicFields = (type) => {
     grid.style.gap = '1rem';
     grid.style.marginTop = '1rem';
     grid.style.paddingTop = '1rem';
-    grid.style.borderTop = '1px dashed #e2e8f0';
+    grid.style.borderTop = '1px dashed var(--line-strong)';
 
     fields.forEach(f => {
         const group = document.createElement('div');
@@ -1016,7 +1059,7 @@ window.openDiagnostic = (idx) => {
 
     const titleEl = document.getElementById('diag-title');
     const subtitleEl = document.getElementById('diag-subtitle');
-    if (titleEl) titleEl.textContent = ` ${t(currentLang, 'diagTitle')}`;
+    if (titleEl) titleEl.textContent = t(currentLang, 'diagTitle');
     if (subtitleEl) subtitleEl.textContent = `${item.assetTag} - ${item.model}`;
     
     if (!item.diagnostics) {
@@ -1035,43 +1078,34 @@ window.openDiagnostic = (idx) => {
             const allChecked = cat.groups.every(g => g.items.every(it => (item.diagnostics[cat.category] || {})[it.id] === true));
 
             section.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
-                    <h3 style="color: var(--primary); margin: 0;">${t(currentLang, cat.category)}</h3>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #64748b;">
-                        <label for="master-${cat.category}" style="cursor: pointer; font-weight: 500;">${t(currentLang, 'checkAll')}</label>
-                        <input type="checkbox" id="master-${cat.category}" ${allChecked ? 'checked' : ''} 
-                            style="width: 18px; height: 18px; cursor: pointer;"
+                <div class="diag-card-header">
+                    <h3>${t(currentLang, cat.category)}</h3>
+                    <div class="diag-card-master">
+                        <label for="master-${cat.category}">${t(currentLang, 'checkAll')}</label>
+                        <input type="checkbox" id="master-${cat.category}" ${allChecked ? 'checked' : ''}
                             onchange="toggleCategoryMaster('${cat.category}', this.checked)">
                     </div>
                 </div>`;
             
             cat.groups.forEach(group => {
                 const groupDiv = document.createElement('div');
-                groupDiv.style.marginBottom = '1.5rem';
-                groupDiv.innerHTML = `<h4 style="margin: 0 0 0.8rem 0; color: #475569; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary);"></span> ${t(currentLang, group.key)}</h4>`;
+                groupDiv.className = 'diag-result-group brand';
+                groupDiv.innerHTML = `<h4><span class="group-dot"></span> ${t(currentLang, group.key)}</h4>`;
                 
                 const itemsList = document.createElement('div');
-                itemsList.style.display = 'flex';
-                itemsList.style.flexDirection = 'column';
-                itemsList.style.gap = '0.75rem';
-                itemsList.style.paddingLeft = '1.2rem';
+                itemsList.className = 'diag-result-items';
 
                 group.items.forEach(it => {
                     const isOk = (item.diagnostics[cat.category] || {})[it.id] === true;
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'diag-item-row';
-                    itemDiv.style.display = 'flex';
-                    itemDiv.style.alignItems = 'flex-start';
-                    itemDiv.style.gap = '0.75rem';
                     
                     itemDiv.innerHTML = `
-                        <input type="checkbox" id="diag-${cat.category}-${it.id}" ${isOk ? 'checked' : ''} 
-                            style="width: 18px; height: 18px; margin-top: 3px; cursor: pointer;"
+                        <input type="checkbox" id="diag-${cat.category}-${it.id}" ${isOk ? 'checked' : ''}
                             onchange="updateDiagState('${cat.category}', '${it.id}', this.checked)">
-                        <label for="diag-${cat.category}-${it.id}" style="cursor: pointer; flex: 1;">
-                            <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">${t(currentLang, it.label)}</div>
-                            <div style="font-size: 0.8rem; color: #64748b; line-height: 1.3;">${t(currentLang, it.desc)}</div>
+                        <label for="diag-${cat.category}-${it.id}">
+                            <div class="diag-item-label">${t(currentLang, it.label)}</div>
+                            <div class="diag-item-desc">${t(currentLang, it.desc)}</div>
                         </label>`;
                     itemsList.appendChild(itemDiv);
                 });
@@ -1150,7 +1184,7 @@ window.openMaintenanceResult = (idx) => {
 
     const titleEl = document.getElementById('result-title');
     const subtitleEl = document.getElementById('result-subtitle');
-    if (titleEl) titleEl.textContent = `✅ ${t(currentLang, 'maintResult')}`;
+    if (titleEl) titleEl.textContent = t(currentLang, 'maintResult');
     if (subtitleEl) subtitleEl.textContent = `${item.assetTag} - ${item.model}`;
 
     if (!item.maintenanceResult) {
@@ -1201,48 +1235,40 @@ window.openMaintenanceResult = (idx) => {
             );
 
             section.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
-                    <h3 style="color: ${allResolved ? '#059669' : '#dc2626'}; margin: 0;">${allResolved ? '✅' : '⚠️'} ${t(currentLang, cat.category)}</h3>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #64748b;">
-                        <label for="resolve-master-${cat.category}" style="cursor: pointer; font-weight: 500;">${t(currentLang, 'checkAll')}</label>
-                        <input type="checkbox" id="resolve-master-${cat.category}" ${allResolved ? 'checked' : ''} 
-                            style="width: 18px; height: 18px; cursor: pointer;"
+                <div class="diag-card-header">
+                    <h3 class="${allResolved ? 'is-resolved' : 'is-pending'}">
+                        <span class="material-symbols-outlined status-icon">${allResolved ? 'check_circle' : 'warning'}</span>
+                        ${t(currentLang, cat.category)}
+                    </h3>
+                    <div class="diag-card-master">
+                        <label for="resolve-master-${cat.category}">${t(currentLang, 'checkAll')}</label>
+                        <input type="checkbox" id="resolve-master-${cat.category}" ${allResolved ? 'checked' : ''}
                             onchange="toggleResolveCategoryMaster('${cat.category}', this.checked)">
                     </div>
                 </div>`;
 
             catFailedGroups.forEach(({ group, failedItems }) => {
                 const groupDiv = document.createElement('div');
-                groupDiv.style.marginBottom = '1.5rem';
-                groupDiv.innerHTML = `<h4 style="margin: 0 0 0.8rem 0; color: #475569; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #dc2626;"></span> ${t(currentLang, group.key)}</h4>`;
+                groupDiv.className = 'diag-result-group';
+                groupDiv.innerHTML = `<h4><span class="group-dot"></span> ${t(currentLang, group.key)}</h4>`;
 
                 const itemsList = document.createElement('div');
-                itemsList.style.display = 'flex';
-                itemsList.style.flexDirection = 'column';
-                itemsList.style.gap = '0.75rem';
-                itemsList.style.paddingLeft = '1.2rem';
+                itemsList.className = 'diag-result-items';
 
                 failedItems.forEach(it => {
                     const isResolved = resolvedItems.includes(`${cat.category}:${it.id}`);
                     const itemDiv = document.createElement('div');
-                    itemDiv.className = 'diag-item-row';
-                    itemDiv.style.display = 'flex';
-                    itemDiv.style.alignItems = 'flex-start';
-                    itemDiv.style.gap = '0.75rem';
-                    itemDiv.style.padding = '0.5rem 0.75rem';
-                    itemDiv.style.borderRadius = '8px';
-                    itemDiv.style.background = isResolved ? '#d1fae5' : '#fee2e2';
-                    itemDiv.style.border = isResolved ? '1px solid #34d399' : '1px solid #fca5a5';
-                    itemDiv.style.transition = 'all 0.2s ease';
+                    itemDiv.className = `diag-item-row ${isResolved ? 'is-resolved' : 'is-pending'}`;
 
                     itemDiv.innerHTML = `
-                        <input type="checkbox" id="resolve-${cat.category}-${it.id}" ${isResolved ? 'checked' : ''} 
-                            style="width: 18px; height: 18px; margin-top: 3px; cursor: pointer;"
+                        <input type="checkbox" id="resolve-${cat.category}-${it.id}" ${isResolved ? 'checked' : ''}
                             onchange="toggleResolvedItem('${cat.category}', '${it.id}', this.checked)">
-                        <label for="resolve-${cat.category}-${it.id}" style="cursor: pointer; flex: 1;">
-                            <div style="font-weight: 600; font-size: 0.9rem; color: ${isResolved ? '#065f46' : '#991b1b'};">${isResolved ? '✅' : '❌'} ${t(currentLang, it.label)}</div>
-                            <div style="font-size: 0.8rem; color: #64748b; line-height: 1.3;">${t(currentLang, it.desc)}</div>
+                        <label for="resolve-${cat.category}-${it.id}">
+                            <div class="diag-item-label">
+                                <span class="material-symbols-outlined status-icon">${isResolved ? 'check_circle' : 'cancel'}</span>
+                                ${t(currentLang, it.label)}
+                            </div>
+                            <div class="diag-item-desc">${t(currentLang, it.desc)}</div>
                         </label>`;
                     itemsList.appendChild(itemDiv);
                 });

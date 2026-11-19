@@ -63,41 +63,20 @@ export function showStatusBanner(message, type = 'info', timeout = 3000) {
     const existing = document.querySelector('.status-banner');
     if (existing) existing.remove();
 
-    const bgColors = {
-        info: 'rgba(53, 37, 205, 0.1)',
-        success: 'rgba(16, 185, 129, 0.15)',
-        error: 'rgba(239, 68, 68, 0.15)'
-    };
     const icons = {
-        info: 'ℹ️',
-        success: '✅',
-        error: '❌'
+        info: 'info',
+        success: 'check_circle',
+        error: 'error'
     };
 
     const banner = document.createElement('div');
-    banner.className = 'status-banner';
-    banner.style.cssText = `
-        position: fixed;
-        bottom: 64px;
-        left: 0;
-        right: 0;
-        padding: 0.75rem 1rem;
-        background: ${bgColors[type] || bgColors.info};
-        color: var(--on-surface);
-        font-size: 0.85rem;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        z-index: 105;
-        max-width: 100%;
-        box-sizing: border-box;
-        backdrop-filter: blur(4px);
-    `;
+    banner.className = `status-banner status-${type || 'info'}`;
     banner.innerHTML = `
-        <span style="flex: 1;">${icons[type] || 'ℹ️'} ${message}</span>
-        <button class="btn-clear btn-xs" style="padding: 0.2rem 0.4rem; font-size: 0.7rem; background: transparent; border: none; color: currentColor;"
-                onclick="this.parentElement.remove()">✕</button>
+        <span class="banner-icon"><span class="material-symbols-outlined">${icons[type] || 'info'}</span></span>
+        <span class="banner-message">${message}</span>
+        <button class="banner-close" type="button" aria-label="Cerrar" onclick="this.parentElement.remove()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
     `;
 
     document.body.appendChild(banner);
@@ -142,7 +121,7 @@ export function checkProceduralIntegrity(item) {
 
 export function showFinalChecklist(onConfirm) {
     Swal.fire({
-        title: '🔒 Checklist de Cierre',
+        title: 'Checklist de Cierre',
         html: `
             <div style="text-align: left; font-size: 0.9rem;">
                 <label style="display:block; margin: 10px 0;"><input type="checkbox" id="check1"> ¿Se realizó limpieza física?</label>
@@ -170,8 +149,8 @@ export function validateRequiredFields(formElement, fieldSelectors) {
     inputs.forEach(input => {
         if (input.hasAttribute('required') && !input.value.trim()) {
             isValid = false;
-            input.style.borderColor = '#ef4444';
-            input.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.1)';
+            input.style.borderColor = 'var(--danger-500)';
+            input.style.boxShadow = 'var(--ring-error)';
         } else {
             input.style.borderColor = '';
             input.style.boxShadow = '';
@@ -191,19 +170,10 @@ export function showErrorSummary(errors, containerSelector = '#officeForm') {
 
     const errorSummary = document.createElement('div');
     errorSummary.className = 'error-summary';
-    errorSummary.style.cssText = `
-        background: #fef2f2;
-        border: 1px solid #fecaca;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 8px;
-        color: #991b1b;
-        font-size: 0.875rem;
-    `;
     errorSummary.innerHTML = `
-        <p style="margin: 0 0 0.5rem 0; font-weight: 500;">Por favor corrige los siguientes errores:</p>
-        <ul style="margin: 0; padding-left: 1rem;">
-            ${errors.map(error => `<li style="margin: 0.25rem 0;">${error}</li>`).join('')}
+        <p>Por favor corrige los siguientes errores:</p>
+        <ul>
+            ${errors.map(error => `<li>${error}</li>`).join('')}
         </ul>
     `;
 

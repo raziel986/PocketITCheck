@@ -19,7 +19,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #ffffff;
+            background: linear-gradient(160deg, #ffffff 0%, #f5f4ff 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,24 +34,28 @@
 
         .loader-container {
             text-align: center;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Manrope', sans-serif;
         }
 
         .spinner-ring {
-            width: 60px;
-            height: 60px;
-            border: 4px solid #f1f5f9;
-            border-top: 4px solid #4f46e5;
+            width: 56px;
+            height: 56px;
+            border: 4px solid #e9e7ff;
+            border-top-color: #4f46e5;
+            border-right-color: #6d5cff;
             border-radius: 50%;
             margin: 0 auto 1.5rem;
-            animation: spin 1s linear infinite;
+            animation: spin 0.9s linear infinite;
+            box-shadow: 0 0 0 6px rgba(79, 70, 229, 0.06);
         }
 
         .loader-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #4f46e5;
-            margin-bottom: 0.5rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #3525cd;
+            margin-bottom: 0.4rem;
         }
 
         @keyframes spin {
@@ -72,7 +76,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PocketITCheck">
     <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233525cd'/%3E%3Crect x='21' y='12' width='22' height='10' rx='3' fill='white'/%3E%3Cpath d='M22 17h-5a4 4 0 0 0-4 4v25a4 4 0 0 0 4 4h26a4 4 0 0 0 4-4V21a4 4 0 0 0-4-4h-5' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='M24 36l6 6 12-13' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="icon-512.png">
     <link rel="manifest" href="manifest.json">
 
@@ -90,7 +94,7 @@
         <div class="loader-container">
             <div class="spinner-ring"></div>
             <div class="loader-text"> <span style="color: var(--primary)">Pocket</span><span
-                    style="color: #000;">IT</span><span style="color: #1b8b2d">Check</span></div>
+                    style="color: var(--ink-900);">IT</span><span style="color: var(--success-500)">Check</span></div>
             <div style="font-size: 0.85rem; color: var(--text-light);" data-i18n="loadingAssets">Cargando Activos IT...
             </div>
         </div>
@@ -105,6 +109,10 @@
             <h1 class="app-title">Pocket<span class="highlight">IT</span>Check</h1>
         </div>
         <div class="header-right">
+            <div class="app-status" id="appStatus" title="Estado de conexión">
+                <span class="status-dot"></span>
+                <span class="status-label" id="appStatusLabel">En línea</span>
+            </div>
             <div class="lang-toggle-container">
                 <label class="switch">
                     <input type="checkbox" id="lang-toggle" onchange="toggleLanguage(this.checked)">
@@ -122,12 +130,20 @@
 
         <!-- VISTA: Formularios Nueva Oficina -->
         <div class="office-section glass-card" id="viewCreateOfficeSidebar" style="display: none;">
-            <button type="button" class="btn btn-clear" onclick="hideAddOfficeForm()"
-                style="margin-top:0; margin-bottom: 1.5rem; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; width: fit-content;"
-                data-i18n="backToOffices">
-                ⬅️ Volver a Oficinas
+            <button type="button" class="btn btn-ghost btn-sm" onclick="hideAddOfficeForm()"
+                style="margin: 0 0 1rem; width: fit-content;">
+                <span class="material-symbols-outlined">arrow_back</span>
+                <span data-i18n="backToOffices">Volver a Oficinas</span>
             </button>
-            <h2 data-i18n="newOffice" style="font-size: 1.1rem; margin-bottom: 1.5rem;">🏢 Nueva Oficina</h2>
+            <div class="view-header">
+                <div class="view-header-icon">
+                    <span class="material-symbols-outlined">business</span>
+                </div>
+                <div class="view-header-text">
+                    <h2 data-i18n="newOffice">Nueva Oficina</h2>
+                    <p data-i18n="newOfficeSub">Registra el cliente y los datos de la auditoría</p>
+                </div>
+            </div>
                 <form id="officeForm">
                     <div class="form-grid-4" style="gap: 1rem;">
                         <div class="form-group">
@@ -171,14 +187,16 @@
                         </div>
                     </div>
                     <div class="button-group" style="flex-direction: row; flex-wrap: wrap; margin-top: 1.5rem;">
-                        <button type="submit" class="btn btn-submit" id="submitBtnOffice" style="background:#10b981; flex: 1; min-width: 180px;"
-                            data-i18n="registerOffice">
-                            📝 Registrar Oficina
+                        <button type="submit" class="btn btn-success" id="submitBtnOffice"
+                            style="flex: 1; min-width: 180px;">
+                            <span class="material-symbols-outlined">save</span>
+                            <span data-i18n="registerOffice">Registrar Oficina</span>
                         </button>
-                        <button type="button" class="btn btn-clear" id="cancelEditOfficeBtn"
-                            style="display: none; flex: 1; min-width: 140px; background-color: #fca5a5; color: white; border:none;"
-                            onclick="cancelEditOffice()" data-i18n="cancelEdit">
-                            ✕ Cancelar Edicion
+                        <button type="button" class="btn btn-danger" id="cancelEditOfficeBtn"
+                            style="display: none; flex: 1; min-width: 140px;"
+                            onclick="cancelEditOffice()">
+                            <span class="material-symbols-outlined">close</span>
+                            <span data-i18n="cancelEdit">Cancelar Edición</span>
                         </button>
                     </div>
                 </form>
@@ -186,18 +204,24 @@
 
             <!-- VISTA: Formulario Nuevo Equipo (Se oculta al inicio) -->
             <div class="input-section glass-card" id="viewAddEquipmentSidebar" style="display: none;">
-                <button type="button" class="btn btn-clear" onclick="hideAddEquipmentForm()"
-                    style="margin-top:0; margin-bottom: 1.5rem; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; width: fit-content;"
-                    data-i18n="cancelEdit">
-                    ⬅️ Cancelar / Volver
+                <button type="button" class="btn btn-ghost btn-sm" onclick="hideAddEquipmentForm()"
+                    style="margin: 0 0 1rem; width: fit-content;">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span data-i18n="back">Volver</span>
                 </button>
-                <div id="activeOfficeSummary"
-                    style="font-size: 0.85rem; padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1.5rem; line-height: 1.5;">
+                <div id="activeOfficeSummary" class="info-panel" style="margin-bottom: 1.5rem;">
                     <!-- Detalles dinamicos -->
                 </div>
 
-                <h2 id="equipmentFormTitle" style="font-size: 1.1rem; margin-bottom: 1.5rem;">
-                    💻 Nuevo Equipo</h2>
+                <div class="view-header">
+                    <div class="view-header-icon soft-blue">
+                        <span class="material-symbols-outlined">devices</span>
+                    </div>
+                    <div class="view-header-text">
+                        <h2 id="equipmentFormTitle" data-i18n="newEquipment">Nuevo Equipo</h2>
+                        <p data-i18n="newEquipmentSub">Completa la información del activo a inventariar</p>
+                    </div>
+                </div>
                 <form id="inventoryForm">
                     <div class="form-grid-3" style="gap: 1rem;">
                         <div class="form-group">
@@ -244,7 +268,7 @@
                                 <option value="No" selected>No</option>
                             </select>
                         </div>
-                        <div class="form-group" id="warrantyStatusDisplay" style="margin-top: 0.5rem; padding: 0.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6; display: none; font-size: 0.85rem; color: #647489;">
+                        <div class="form-group info-panel" id="warrantyStatusDisplay" style="margin-top: 0.5rem; display: none;">
                             <span id="warrantyStatusText"></span>
                         </div>
                         <div class="form-group" id="purchaseDateContainer" style="display: none;">
@@ -267,8 +291,8 @@
 
                     <!-- Nueva sección: Auto-rellenado de sistema -->
                     <div class="form-group" style="margin-top: 0.5rem;">
-                        <button type="button" id="btnCollectSystemInfo" class="btn btn-submit w-100"
-                            style="background: #3b82f6; color: white; border: none; padding: 0.5rem;"
+                        <button type="button" id="btnCollectSystemInfo" class="btn btn-info w-100"
+                            style="padding: 0.5rem;"
                             onclick="collectAndFillSystemInfo()">
                             <span class="material-symbols-outlined">system_update_alt</span>
                             Auto-rellenar Sistema
@@ -277,8 +301,8 @@
 
                     <!-- Nueva sección: Captura de foto del equipo -->
                     <div class="form-group" style="margin-top: 0.5rem;">
-                        <button type="button" id="btnCapturePhoto" class="btn btn-submit w-100"
-                            style="background: #10b981; color: white; border: none; padding: 0.5rem;"
+                        <button type="button" id="btnCapturePhoto" class="btn btn-success w-100"
+                            style="padding: 0.5rem;"
                             onclick="captureEquipmentPhotoAndSave()">
                             <span class="material-symbols-outlined">camera_alt</span>
                             Capturar Foto del Equipo
@@ -293,13 +317,15 @@
 
                     <!-- Botones de Accion sobre INVENTARIO -->
                     <div class="button-group" style="flex-direction: row; flex-wrap: wrap; margin-top: 1.5rem;">
-                        <button type="submit" id="submitBtnEquipment" class="btn btn-submit" data-i18n="addEquipment" style="flex: 1; min-width: 180px;">
-                             Añadir Equipo
+                        <button type="submit" id="submitBtnEquipment" class="btn btn-submit" style="flex: 1; min-width: 180px;">
+                            <span class="material-symbols-outlined">add</span>
+                            <span data-i18n="addEquipment">Añadir Equipo</span>
                         </button>
-                        <button type="button" class="btn btn-clear" id="cancelEditBtn"
-                            style="display: none; flex: 1; min-width: 140px; background-color: #fca5a5; color: white; border:none;"
-                            onclick="cancelEdit()" data-i18n="cancelEdit">
-                            ✕ Cancelar Edicion
+                        <button type="button" class="btn btn-danger" id="cancelEditBtn"
+                            style="display: none; flex: 1; min-width: 140px;"
+                            onclick="cancelEdit()">
+                            <span class="material-symbols-outlined">close</span>
+                            <span data-i18n="cancelEdit">Cancelar Edición</span>
                         </button>
                     </div>
                 </form>
@@ -308,16 +334,20 @@
 
         <!-- CUERPO DERECHO: VISTA Lista de Oficinas -->
         <div class="output-section glass-card" id="viewOfficesTable">
-            <h2
-                style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                <span data-i18n="officeManagerSub">🏢 Gestor de Oficinas y Clientes</span><span id="officeCountBadge"
-                        style="font-size: 0.9rem; background: #e0e7ff; color: #4338ca; padding: 0.25rem 0.75rem; border-radius: 9999px;">
-                        0 oficinas
-                    </span>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <button class="btn btn-submit" style="padding: 0.4rem 0.8rem; min-height: 0; font-size: 0.9rem;" onclick="showAddOfficeForm()" data-i18n="newOffice">+ Nueva Oficina</button>
+            <div class="view-header">
+                <div class="view-header-icon">
+                    <span class="material-symbols-outlined">apartment</span>
                 </div>
-            </h2>
+                <div class="view-header-text">
+                    <h2 data-i18n="officeManagerSub">Gestor de Oficinas y Clientes</h2>
+                    <p data-i18n="officeManagerSubHint">Administra tus clientes y su inventario de equipos</p>
+                </div>
+                <span id="officeCountBadge" class="badge-count" style="margin-left: auto;">0 oficinas</span>
+                <button class="btn btn-submit btn-sm" onclick="showAddOfficeForm()">
+                    <span class="material-symbols-outlined">add</span>
+                    <span data-i18n="newOffice">Nueva Oficina</span>
+                </button>
+            </div>
             <div class="table-controls">
                 <div class="table-control-group">
                     <label data-i18n="viewLabel">Ver</label>
@@ -329,7 +359,7 @@
                     </select>
                 </div>
                 <div class="search-input-wrapper">
-                    <span class="search-icon">🔍</span>
+                    <span class="material-symbols-outlined search-icon">search</span>
                     <input type="text" id="officeSearch" placeholder="Buscar..." data-i18n-placeholder="searchPl"
                         oninput="handleSearch('offices', this.value)">
                 </div>
@@ -356,15 +386,27 @@
         <!-- CUERPO DERECHO: VISTA Tabla de Inventario de la Oficina -->
         <div class="output-section glass-card" id="viewInventoryTable" style="display: none;">
             <div class="inv-header">
-                <button type="button" class="btn-back" onclick="goBackToOffices()" data-i18n="backToOffices">
-                    <span class="material-symbols-outlined">arrow_back</span> Volver
+                <button type="button" class="btn-back" onclick="goBackToOffices()">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span data-i18n="backToOffices">Volver a Oficinas</span>
                 </button>
                 <div class="inv-title-row">
                     <div class="inv-title-left">
-                        <h2 data-i18n="pdfInventoryTitle">📋 Inventario de Equipos</h2>
+                        <div class="view-header" style="margin-bottom: 0;">
+                            <div class="view-header-icon soft-blue">
+                                <span class="material-symbols-outlined">inventory_2</span>
+                            </div>
+                            <div class="view-header-text">
+                                <h2 data-i18n="pdfInventoryTitle">Inventario de Equipos</h2>
+                                <p data-i18n="inventorySub">Equipos registrados en esta oficina</p>
+                            </div>
+                        </div>
                         <span id="itemCount" class="badge-count">0 items</span>
                     </div>
-                    <button class="btn btn-submit btn-sm" onclick="showAddEquipmentForm()" data-i18n="addEquipment">+ Nuevo Equipo</button>
+                    <button class="btn btn-submit btn-sm" onclick="showAddEquipmentForm()">
+                        <span class="material-symbols-outlined">add</span>
+                        <span data-i18n="addEquipment">Nuevo Equipo</span>
+                    </button>
                 </div>
             </div>
 
@@ -399,7 +441,7 @@
                     </select>
                 </div>
                 <div class="search-input-wrapper">
-                    <span class="search-icon">🔍</span>
+                    <span class="material-symbols-outlined search-icon">search</span>
                     <input type="text" id="equipmentSearch" placeholder="Buscar..." data-i18n-placeholder="searchPl"
                         oninput="handleSearch('equipment', this.value)">
                 </div>
@@ -425,15 +467,16 @@
 
         <!-- CUERPO DERECHO: VISTA Diagnostico Integrado -->
         <div class="output-section glass-card" id="diag-integrated-section" style="display: none;">
-            <div class="diag-header"
-                style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                <div style="flex: 1; min-width: 0;">
-                    <h2 id="diag-title"
-                        style="margin: 0; color: var(--primary); word-break: break-all; white-space: normal;"
-                        data-i18n="diagTitle">🩺 Diagnostico Tecnico</h2>
-                    <p id="diag-subtitle"
-                        style="margin: 0.2rem 0 0 0; color: var(--text-light); word-break: break-all; white-space: normal;">
-                    </p>
+            <div class="diag-header" style="border-bottom: 1px solid var(--line); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div class="view-header" style="margin-bottom: 0;">
+                    <div class="view-header-icon soft-amber">
+                        <span class="material-symbols-outlined">monitor_heart</span>
+                    </div>
+                    <div class="view-header-text" style="flex: 1; min-width: 0;">
+                        <h2 id="diag-title" data-i18n="diagTitle"
+                            style="word-break: break-all; white-space: normal;">Diagnostico Tecnico</h2>
+                        <p id="diag-subtitle" style="word-break: break-all; white-space: normal;"></p>
+                    </div>
                 </div>
             </div>
 
@@ -441,21 +484,24 @@
                 <!-- Secciones de Hardware y Software -->
             </div>
 
-            <div style="margin-top: 2rem; border-top: 2px solid #f1f5f9; padding-top: 1.5rem;">
-                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main);"
-                    data-i18n="observations">📍 
-                    Observaciones y Recomendaciones:</label>
+            <div style="margin-top: 2rem; border-top: 1px solid var(--line); padding-top: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--ink-700);"
+                    data-i18n="observations">Observaciones y Recomendaciones:</label>
                 <textarea id="diag-notes-input" class="diag-notes"
-                    style="width: 100%; min-height: 100px; padding: 1rem; border-radius: 12px; border: 1px solid #cbd5e1; font-family: inherit; resize: vertical;"
+                    style="width: 100%; min-height: 100px; padding: 1rem; resize: vertical;"
                     placeholder="Detalles tecnicos encontrados..." data-i18n-placeholder="diagNotesPl"></textarea>
 
                 <div class="button-group" style="margin-top: 1.5rem;">
                     <button class="btn btn-submit" style="flex: 2; padding: 0.75rem;"
-                        onclick="saveIntegratedDiagnosticFlow()" data-i18n="saveAsset">💾 Guardar Cambios en
-                        Activo</button>
-                    <button class="btn btn-clear"
-                        style="flex: 1; padding: 0.75rem; background-color: #fca5a5; color: white; border: none;"
-                        onclick="closeIntegratedDiagnostic()" data-i18n="close">✕ Cerrar</button>
+                        onclick="saveIntegratedDiagnosticFlow()">
+                        <span class="material-symbols-outlined">save</span>
+                        <span data-i18n="saveAsset">Guardar Cambios en Activo</span>
+                    </button>
+                    <button class="btn btn-danger" style="flex: 1; padding: 0.75rem;"
+                        onclick="closeIntegratedDiagnostic()">
+                        <span class="material-symbols-outlined">close</span>
+                        <span data-i18n="close">Cerrar</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -463,67 +509,75 @@
         <!-- CUERPO DERECHO: VISTA Resultados de Mantenimiento -->
         <div class="output-section glass-card" id="result-integrated-section" style="display: none;">
             <div class="diag-header"
-                style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                <div>
-                    <h2 id="result-title"
-                        style="margin: 0; color: #059669; display: flex; align-items: center; gap: 0.5rem;"
-                        data-i18n="maintResult">
-                        Resultado de Mantenimiento</h2>
-                    <p id="result-subtitle" style="margin: 0.2rem 0 0 0; color: var(--text-light);"></p>
+                style="border-bottom: 1px solid var(--line); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div class="view-header" style="margin-bottom: 0;">
+                    <div class="view-header-icon soft-blue">
+                        <span class="material-symbols-outlined">task_alt</span>
+                    </div>
+                    <div class="view-header-text">
+                        <h2 id="result-title" data-i18n="maintResult">Resultado de Mantenimiento</h2>
+                        <p id="result-subtitle"></p>
+                    </div>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
                 <div class="form-group">
                     <label style="font-weight: 700;" data-i18n="maintStatus">Estado del Mantenimiento:</label>
-                    <select id="result-status"
-                        style="width:100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit;">
-                        <option value="Pendiente">⌛ Pendiente</option>
-                        <option value="Parcial">🔧 Parcial</option>
-                        <option value="Completado">✅ Completado</option>
+                    <select id="result-status" style="width:100%; padding: 0.6rem;">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Parcial">Parcial</option>
+                        <option value="Completado">Completado</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label style="font-weight: 700;" data-i18n="execDate">Fecha de Ejecucion:</label>
-                    <input type="date" id="result-date"
-                        style="width:100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit;">
+                    <input type="date" id="result-date" style="width:100%; padding: 0.6rem;">
                 </div>
             </div>
 
             <div style="margin-bottom: 1.5rem;">
                 <h5 data-i18n="diagItems"
-                    style="margin-bottom: 0.8rem; color: #64748b; border-bottom: 2px solid #cbd5e1; font-size: 0.9rem; padding-bottom: 0.3rem;">
+                    style="margin-bottom: 0.8rem; color: var(--ink-500); border-bottom: 1px solid var(--line); font-size: 0.9rem; padding-bottom: 0.3rem;">
                     ÍTEMS DIAGNOSTICADOS — Marcar los resueltos</h5>
                 <div id="result-items-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                     <!-- Populated dynamically with category cards -->
                 </div>
             </div>
 
-            <div style="margin-top: 1.5rem; border-top: 2px solid #f1f5f9; padding-top: 1.5rem;">
-                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main);"
-                    data-i18n="postMaintNotes">📍 
-                    Notas Post-Mantenimiento:</label>
+            <div style="margin-top: 1.5rem; border-top: 1px solid var(--line); padding-top: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--ink-700);"
+                    data-i18n="postMaintNotes">Notas Post-Mantenimiento:</label>
                 <textarea id="result-notes-input"
-                    style="width: 100%; min-height: 100px; padding: 1rem; border-radius: 12px; border: 1px solid #cbd5e1; font-family: inherit; resize: vertical;"
+                    style="width: 100%; min-height: 100px; padding: 1rem; resize: vertical;"
                     placeholder="Detallar las acciones correctivas ejecutadas..."
                     data-i18n-placeholder="maintNotesPl"></textarea>
 
                 <div class="button-group" style="margin-top: 1.5rem;">
-                    <button class="btn btn-submit" style="flex: 2; padding: 0.75rem;" onclick="saveMaintenanceResult()"
-                        data-i18n="saveResult">💾 Guardar Resultado</button>
-                    <button class="btn btn-clear"
-                        style="flex: 1; padding: 0.75rem; background-color: #fca5a5; color: white; border: none;"
-                        onclick="closeMaintenanceResult()" data-i18n="close">✕ Cerrar</button>
+                    <button class="btn btn-submit" style="flex: 2; padding: 0.75rem;" onclick="saveMaintenanceResult()">
+                        <span class="material-symbols-outlined">save</span>
+                        <span data-i18n="saveResult">Guardar Resultado</span>
+                    </button>
+                    <button class="btn btn-danger" style="flex: 1; padding: 0.75rem;"
+                        onclick="closeMaintenanceResult()">
+                        <span class="material-symbols-outlined">close</span>
+                        <span data-i18n="close">Cerrar</span>
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- VISTA: Settings / Configuración -->
         <div id="viewSettings" style="display: none;">
-            <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                <span class="material-symbols-outlined" style="color: var(--primary);">settings</span>
-                <span data-i18n="settingsTitle">Configuración</span>
-            </h2>
+            <div class="view-header">
+                <div class="view-header-icon">
+                    <span class="material-symbols-outlined">settings</span>
+                </div>
+                <div class="view-header-text">
+                    <h2 data-i18n="settingsTitle">Configuración</h2>
+                    <p data-i18n="settingsSub">Preferencias y gestión de datos de la aplicación</p>
+                </div>
+            </div>
 
             <!-- Data Management -->
             <div class="settings-group">

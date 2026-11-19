@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketit-check-v6';
+const CACHE_NAME = 'pocketit-check-v10';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -14,7 +14,8 @@ const ASSETS_TO_CACHE = [
     './libs/jspdf.umd.min.js',
     './libs/jspdf-autotable.min.js',
     './libs/sweetalert2.all.min.js',
-    'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap'
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap',
+    'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap'
 ];
 
 // Install Event
