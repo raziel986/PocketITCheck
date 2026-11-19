@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pocketit-check-v5';
+const CACHE_NAME = 'pocketit-check-v6';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

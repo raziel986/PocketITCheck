@@ -1,4 +1,4 @@
-import { applyTranslations, updatePagination, categoryFields, collectSystemInfo, checkProceduralIntegrity, showFinalChecklist, validateRequiredFields, showErrorSummary } from './js/ui.js';
+import { applyTranslations, updatePagination, categoryFields, collectSystemInfo, checkProceduralIntegrity, showFinalChecklist, validateRequiredFields, showErrorSummary, autoResizeTextarea, handleMobileFormScroll, showStatusBanner, captureEquipmentPhoto, diagnosticModes } from './js/ui.js';
 import { t, tPdf } from './js/translations.js';
 import { getStatusColor, drawHeaderTypeA, drawHeaderTypeB, drawSubheader, drawModelSignatures, addModelPageNumbers } from './js/pdf_engine.js';
 import { getAllOffices, saveOffice, deleteOffice, migrateFromLocalStorage } from './js/db.js';
@@ -236,22 +236,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     init();
 
     // Initialize mobile optimizations
-    document.addEventListener('DOMContentLoaded', () => {
-        // Auto-resize textareas
-        const textareas = document.querySelectorAll('textarea');
-        textareas.forEach(el => autoResizeTextarea(el));
+    // Auto-resize textareas
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(el => autoResizeTextarea(el));
 
-        // Handle mobile form scroll to prevent viewport jumps
-        handleMobileFormScroll();
+    // Handle mobile form scroll to prevent viewport jumps
+    handleMobileFormScroll();
 
-        // Add pull-to-refresh already implemented via touch events in ui.js
-
-        // Show initial status if coming from pull-to-refresh
-        if (window.location.hash === '#refreshed') {
-            showStatusBanner('Datos actualizados correctamente', 'success', 2000);
-            window.location.hash = '';
-        }
-    });
+    // Show initial status if coming from pull-to-refresh
+    if (window.location.hash === '#refreshed') {
+        showStatusBanner('Datos actualizados correctamente', 'success', 2000);
+        window.location.hash = '';
+    }
 });
 
 // Init
@@ -333,7 +329,7 @@ window.checkWarrantyStatusAuto = () => {
     // Update UI display
     if (statusDisplay && statusText) {
         if (hasWarranty === 'Si' && purchaseDate && warrantyDate) {
-            const result = window.diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
+            const result = diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
             statusDisplay.style.display = 'block';
             statusText.textContent = result.message;
 
@@ -351,7 +347,7 @@ window.checkWarrantyStatusAuto = () => {
 
     // Show alert if expiring soon or expired
     if (hasWarranty === 'Si' && purchaseDate && warrantyDate) {
-        const result = window.diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
+        const result = diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
 
         if (result.status === 'expiring_soon' || result.status === 'expired') {
             const icon = result.status === 'expired' ? 'error' : 'warning';
@@ -372,7 +368,7 @@ window.collectAndFillSystemInfo = async () => {
     const warrantyDate = document.getElementById('warrantyDate')?.value;
 
     if (hasWarranty === 'Si' && purchaseDate && warrantyDate) {
-        const result = window.diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
+        const result = diagnosticModes.checkWarrantyStatus(purchaseDate, warrantyDate);
 
         if (typeof Swal !== 'undefined') {
             const icon = result.daysRemaining > 0 ? 'success' : result.daysRemaining > -30 ? 'warning' : 'error';
