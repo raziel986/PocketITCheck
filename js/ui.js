@@ -161,6 +161,26 @@ export function showFinalChecklist(onConfirm) {
     });
 }
 
+/* Validate that required fields are filled before form submission */
+export function validateRequiredFields(formElement, fieldSelectors) {
+    if (!formElement) return false;
+    let isValid = true;
+    const inputs = formElement.querySelectorAll(fieldSelectors.join(', '));
+
+    inputs.forEach(input => {
+        if (input.hasAttribute('required') && !input.value.trim()) {
+            isValid = false;
+            input.style.borderColor = '#ef4444';
+            input.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.1)';
+        } else {
+            input.style.borderColor = '';
+            input.style.boxShadow = '';
+        }
+    });
+
+    return isValid;
+}
+
 /* New: Show error summary for form validation */
 export function showErrorSummary(errors, containerSelector = '#officeForm') {
     const container = document.querySelector(containerSelector);

@@ -1,4 +1,4 @@
-import { applyTranslations, updatePagination, categoryFields, collectSystemInfo, checkProceduralIntegrity, showFinalChecklist } from './js/ui.js';
+import { applyTranslations, updatePagination, categoryFields, collectSystemInfo, checkProceduralIntegrity, showFinalChecklist, validateRequiredFields, showErrorSummary } from './js/ui.js';
 import { t, tPdf } from './js/translations.js';
 import { getStatusColor, drawHeaderTypeA, drawHeaderTypeB, drawSubheader, drawModelSignatures, addModelPageNumbers } from './js/pdf_engine.js';
 import { getAllOffices, saveOffice, deleteOffice, migrateFromLocalStorage } from './js/db.js';
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const isValid = validateRequiredFields(dom.equipForm,
                 ['#type', '#model', '#serial', '#assetTag', '#status', '#user']);
             if (!isValid) {
-                showErrorSummary(['Por favor completa todos los campos obligatorios marcados con *']);
+                showErrorSummary(['Por favor completa todos los campos obligatorios marcados con *'], '#inventoryForm');
                 return;
             }
 
